@@ -21,6 +21,9 @@ class Planet:
         parts = info.split()
         self.name = parts[0]
         self.score = int(parts[1])
+        self.numObservations = int(parts[12])
+        self.arc = float(parts[-3])
+        self.notSeenDays = float(parts[-1])
         # Rectacension
         self.ra = float(parts[5])
         # Declination
@@ -29,6 +32,7 @@ class Planet:
         # Object not good for observing
         self.discard = False
 
+        # pdb.set_trace()
         print("\nWorking on: " + self.name)
 
         self.scatterednessUrl = False
@@ -43,13 +47,13 @@ class Planet:
             logger.warning('Planet ' + self.name + ' discarded. Reason: score too low (' + str(self.score) + ')')
 
         if self.scatterednessUrl:
-            scat = self.getScatteredness()
+            self.scatteredness = self.getScatteredness()
 
-            if scat[0] > Planet.maxScatteredness[0] or scat[1] > Planet.maxScatteredness[1]:
+            if self.scatteredness[0] > Planet.maxScatteredness[0] or self.scatteredness[1] > Planet.maxScatteredness[1]:
                 self.discard = True
-                logger.warning('Planet ' + self.name + ' discarded. Reason: predicted locations too scattered (' + str(scat[0]) + ', ' + str(scat[1]) + ')')
-            elif scat[0] > Planet.maxScatterednessWarning[0] or scat[1] > Planet.maxScatterednessWarning[1]:
-                logger.warning('Location of planet ' + self.name + ' is very scattered! (' + str(scat[0]) + ', ' + str(scat[1]) + ')')
+                logger.warning('Planet ' + self.name + ' discarded. Reason: predicted locations too scattered (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
+            elif self.scatteredness[0] > Planet.maxScatterednessWarning[0] or self.scatteredness[1] > Planet.maxScatterednessWarning[1]:
+                logger.warning('Location of planet ' + self.name + ' is very scattered! (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
             # pdb.set_trace()
 
         # TODO: filter not seen > 1.2 days (and added)
@@ -80,19 +84,26 @@ class Planet:
     def getEphemerides(self):
         url = "https://cgi.minorplanetcenter.net/cgi-bin/confirmeph2.cgi"
         # print(self.name)
-        req = requests.post(url, data={"mb": -30, "mf": 30, "dl": -90, "du": +90, "nl": 0, "nu": 100, "sort": "d", "W": "j", "obj": self.name, "Parallax": 1, "obscode": "L01", "long": None, "lat": None, "alt": None, "int": 1, "start": 0, "raty": "a", "mot": "m", "dmot": "p", "out": "f", "sun": "x", "oalt": 20})
-        resp = req.text
-        page = BeautifulSoup(resp, "html5lib")
+        resp = requests.post(url, data={"mb": -30, "mf": 30, "dl": -90, "du": +90, "nl": 0, "nu": 100, "sort": "d", "W": "j", "obj": self.name, "Parallax": 1, "obscode": "L01", "long": None, "lat": None, "alt": None, "int": 1, "start": 0, "raty": "a", "mot": "m", "dmot": "p", "out": "f", "sun": "x", "oalt": 20})
+        resp1 = resp.text
+        page = BeautifulSoup(resp1, "html5lib")
         links = page.find("pre")
         lines = (links.text).split("\n")
         lines = lines[2:-1]
         lines = [l for l in lines if "<suppressed>" not in l]
 
+        # if self.name == 'ZTF00Wh':
+        #     pdb.set_trace()
+
         # if html.find("pre").find_all('a')[2]['href']
         if len(page.find("pre").find_all('a')) > 1 and page.find("pre").find_all('a')[1]['href']:
             self.scatterednessUrl = page.find("pre").find_all('a')[1]['href']
 
-        tree = html.fromstring(req.content)
+        tree = html.fromstring(resp.content)
+        mapLinks = tree.xpath("//pre/a[text()='Map']/@href")
+        if len(mapLinks) > 0:
+            self.mapLink = mapLinks[0]
+
         if len(tree.xpath("//a[text()='observations']/@href")) > 0:
             self.observationsUrl = tree.xpath("//a[text()='observations']/@href")[0]
 
@@ -130,8 +141,7 @@ class Planet:
 
     # scatteredness of results
     def getScatteredness(self):
-        req = requests.get(self.scatterednessUrl)
-        resp = req.text
+        resp = requests.get(self.scatterednessUrl).text
         html = BeautifulSoup(resp, "html5lib")
         links = html.find("pre")
 
@@ -193,9 +203,9 @@ class Main:
 
     def getData(self):
         url = "https://www.minorplanetcenter.net/iau/NEO/neocp.txt"
-        req = requests.get(url).text[:-1].split("\n")
+        resp = requests.get(url).text[:-1].split("\n")
         planets = []
-        for planetString in req:
+        for planetString in resp:
             p = Planet(planetString)
             # TODO: check if planet is OK or discard otherwise
             planets.append(p)
@@ -218,7 +228,13 @@ class Main:
             sortedPlanets = self.sortByMaxAlt()
             for p in sortedPlanets:
                 if not p.discard:
-                    f.write("* " + p.name + "         score=" + str(p.score) + ", observationTime=" + str(p.maxAltitudeEphemeride.observationTime) + "\n")
+                    # pdb.set_trace()
+                    fileLine = "* " + p.name + "         score=" + str(p.score) + ', obs=' + str(p.numObservations) + ', arc=' + str(p.arc) + ', notSeen=' + str(p.notSeenDays) + "days, obsExposure=" + str(p.maxAltitudeEphemeride.observationTime) + 'min'
+                    if hasattr(p, 'scatteredness'):
+                        fileLIne += ', scatteredness=(' + str(p.scatteredness[0]) + ',' + str(p.scatteredness[1]) + ')'
+                    if hasattr(p, 'mapLink'):
+                        fileLIne += ', mapLink=' + p.mapLink
+                    f.write(fileLine + "\n")
                     f.write(p.maxAltitudeEphemeride.line + "\n\n")
             f.close()
 
