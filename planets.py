@@ -40,20 +40,20 @@ class Planet:
 
         if self.haveWeObserved():
             self.discard = True
-            logger.warning('Planet ' + self.name + ' discarded. Reason: we have observed it already before')
+            logging.warning('Planet ' + self.name + ' discarded. Reason: we have observed it already before')
 
         if self.score < Planet.minScore:
             self.discard = True
-            logger.warning('Planet ' + self.name + ' discarded. Reason: score too low (' + str(self.score) + ')')
+            logging.warning('Planet ' + self.name + ' discarded. Reason: score too low (' + str(self.score) + ')')
 
         if self.scatterednessUrl:
             self.scatteredness = self.getScatteredness()
 
             if self.scatteredness[0] > Planet.maxScatteredness[0] or self.scatteredness[1] > Planet.maxScatteredness[1]:
                 self.discard = True
-                logger.warning('Planet ' + self.name + ' discarded. Reason: predicted locations too scattered (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
+                logging.warning('Planet ' + self.name + ' discarded. Reason: predicted locations too scattered (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
             elif self.scatteredness[0] > Planet.maxScatterednessWarning[0] or self.scatteredness[1] > Planet.maxScatterednessWarning[1]:
-                logger.warning('Location of planet ' + self.name + ' is very scattered! (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
+                logging.warning('Location of planet ' + self.name + ' is very scattered! (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
             # pdb.set_trace()
 
         # TODO: filter not seen > 1.2 days (and added)
@@ -67,18 +67,18 @@ class Planet:
                 # print("Max Altitude Date: " + self.maxAltitudeEphemeride.date)
                 if self.maxAltitudeEphemeride.effMagnitude > Planet.minMagnitude:
                     self.discard = True
-                    logger.warning('Planet ' + self.name + ' discarded. Reason: effective magnitude too low (' + str(self.maxAltitudeEphemeride.magnitude) + ')')
+                    logging.warning('Planet ' + self.name + ' discarded. Reason: effective magnitude too low (' + str(self.maxAltitudeEphemeride.effMagnitude) + ')' + ' Absolute magnitude (' + str(self.maxAltitudeEphemeride.magnitude) + ')')
             else:
                 self.discard = True
-                logger.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
+                logging.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
         else:
             self.discard = True
-            logger.warning('Planet ' + self.name + ' discarded. Reason: no ephemerides available')
+            logging.warning('Planet ' + self.name + ' discarded. Reason: no ephemerides available')
 
         
 
         if not self.discard:
-            logger.warning('PLANET OK: ' + self.name)
+            logging.warning('PLANET OK: ' + self.name)
 
 
     def getEphemerides(self):
@@ -117,9 +117,9 @@ class Planet:
         maxAlt = float("-inf")
         index = None
 
-        # logger.warning('Obtaining efemeride for: ' + self.name)
+        # logging.warning('Obtaining efemeride for: ' + self.name)
         for i, eph in enumerate(self.ephemerides):
-            # logger.warning('Eph.alt: ' + str(eph.alt))
+            # logging.warning('Eph.alt: ' + str(eph.alt))
             if eph.alt > maxAlt:
                 maxAlt = eph.alt
                 index = i
@@ -181,7 +181,7 @@ class Ephemeride:
         # Observation time needed (in minutes) - approximates the imaging time needed to get a good picture
         self.observationTime = self.getObservationTime()
         # pdb.set_trace()
-        # logger.warning('Magnitude vs Effective Magnitude: ' + str(self.magnitude) + " : " + str(self.effMagnitude))
+        # logging.warning('Magnitude vs Effective Magnitude: ' + str(self.magnitude) + " : " + str(self.effMagnitude))
 
 
     def isValid(self):
@@ -190,7 +190,10 @@ class Ephemeride:
         return False
 
     def getEffectiveMagnitude(self):
-        return self.magnitude + ((self.alt - 40) * 0.1)
+        if self.alt < 40:
+            return self.magnitude + ((self.alt - 40) * 0.1)
+        else:
+            return self.magnitude
 
     def getObservationTime(self):
         return round(10 + (self.effMagnitude - 18) * 5, 2)
@@ -217,11 +220,11 @@ class Main:
 
 
     def writeToFile(self):
-        logger.warning('Writing output to file')
+        logging.warning('Writing output to file')
 
         # pdb.set_trace()
 
-        with open(datetime.datetime.now().strftime("%Y%m%d%H%M%S") + "-planets", "w") as f:
+        with open(datetime.datetime.now().strftime("%Y-%m-%d") + ".txt", "w") as f:
             header = """Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
                        h m                                      "/min   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt."""+"\n\n\n"
             f.write(header + "\n")
@@ -231,13 +234,40 @@ class Main:
                     # pdb.set_trace()
                     fileLine = "* " + p.name + "         score=" + str(p.score) + ', obs=' + str(p.numObservations) + ', arc=' + str(p.arc) + ', notSeen=' + str(p.notSeenDays) + "days, obsExposure=" + str(p.maxAltitudeEphemeride.observationTime) + 'min'
                     if hasattr(p, 'scatteredness'):
-                        fileLIne += ', scatteredness=(' + str(p.scatteredness[0]) + ',' + str(p.scatteredness[1]) + ')'
+                        fileLine += ', scatteredness=(' + str(p.scatteredness[0]) + ',' + str(p.scatteredness[1]) + ')'
                     if hasattr(p, 'mapLink'):
-                        fileLIne += ', mapLink=' + p.mapLink
+                        fileLine += ', mapLink=' + p.mapLink
                     f.write(fileLine + "\n")
                     f.write(p.maxAltitudeEphemeride.line + "\n\n")
             f.close()
 
-logger = logging.getLogger()
+# logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+# Get All parameters first
+minScore = input('Minimum score (' + str(Planet.minScore) + ')? ')
+if minScore.isdigit():
+    Planet.minScore = int(minScore)
+print('Minimum score: ' + str(Planet.minScore))
+
+minMagnitude = input('Minimum efective magnitude (' + str(Planet.minMagnitude) + ')? ')
+if minMagnitude.isdigit():
+    Planet.minMagnitude = int(minMagnitude)
+print('Minimum efective magnitude: ' + str(Planet.minMagnitude))
+
+maxScatteredness1 = input('Maximum scateredness in x coordinate (' + str(Planet.maxScatteredness[0]) + ')? ')
+if maxScatteredness1.isdigit():
+    Planet.maxScatteredness = (int(maxScatteredness1), Planet.maxScatteredness[1])
+maxScatteredness2 = input('Maximum scateredness in y coordinate (' + str(Planet.maxScatteredness[1]) + ')? ')
+if maxScatteredness2.isdigit():
+    Planet.maxScatteredness = (Planet.maxScatteredness[0], int(maxScatteredness2))
+print('Maximum scateredness: (' + str(Planet.maxScatteredness[0]) + ', ' + str(Planet.maxScatteredness[1]) + ')')
+
+maxSunAlt = input('Maximum sun altitude (' + str(Ephemeride.maxSunAlt) + ')? ')
+if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', maxSunAlt):
+    Ephemeride.maxSunAlt = float(maxSunAlt)
+print('Maximum sun altitude: ' + str(Ephemeride.maxSunAlt))
+
+
+# Start the program
 planets = Main()
-# pdb.set_trace()
