@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <title>Sky Map</title>
+    <style>
+      body{
+        margin: 0px;
+        background-color: black;
+        height: 100%;
+      }
+      svg {
+        display: block;
+        max-height: 100%;
+        margin: 0 auto;
+      }      
+      .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9, .m10, .m11, .m12, .m13, .m14, .m15, .m16, .m17 {
+        fill: #CEFF00; 
+      }
+      .m18 {
+        fill: #FFFF00; 
+      }
+      .m19 {
+        fill: #FF9700; 
+      }
+      .m20 {
+        fill: #FF0074; 
+      }
+      .m21 {
+        fill: #F800FF; 
+      }
+      .m22, .m23, .m24, .m25, .m26, .m27 {
+        fill: #8800FF; 
+      }
+    </style>
+  </head>
+  <body>
+    <?xml version="1.0" encoding="utf-8"?>
+    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+       viewBox="0 0 2500 2500" enable-background="new 0 0 2500 2500" xml:space="preserve">
+    <rect x="-0.5" y="-0.5" fill="#000000" width="2500.5" height="2500.5"/>
+    <radialGradient id="SVGID_1_" cx="1251.8641" cy="1251.8641" r="937.5703" gradientTransform="matrix(1.0667 0 0 1.0667 -83.3667 -83.3667)" gradientUnits="userSpaceOnUse">
+      <stop  offset="0" style="stop-color:#000000"/>
+      <stop  offset="0.3633" style="stop-color:#000202"/>
+      <stop  offset="0.5747" style="stop-color:#00070B"/>
+      <stop  offset="0.7471" style="stop-color:#001019"/>
+      <stop  offset="0.8976" style="stop-color:#001D2D"/>
+      <stop  offset="1" style="stop-color:#00293F"/>
+    </radialGradient>
+    <circle fill="url(#SVGID_1_)" cx="1252" cy="1252" r="1000.1"/>
+    <line fill="none" stroke="#333333" stroke-width="2.8346" stroke-miterlimit="10" x1="1249.7" y1="2145.7" x2="1249.7" y2="353.6"/>
+    <line fill="none" stroke="#333333" stroke-width="2.8346" stroke-miterlimit="10" x1="353.6" y1="1249.7" x2="2145.7" y2="1249.7"/>
+    <text transform="matrix(1 0 0 1 1226.9199 318.9668)" fill="#00A6FF" font-family="'ArialMT'" font-size="55.7107px">N</text>
+    <text transform="matrix(1 0 0 1 1230.9199 2217.6504)" fill="#00A6FF" font-family="'ArialMT'" font-size="55.7107px">S</text>
+    <text transform="matrix(1 0 0 1 275.3184 1269.6309)" fill="#00A6FF" font-family="'ArialMT'" font-size="55.7107px">E</text>
+    <text transform="matrix(1 0 0 1 2178.6465 1268.6309)" fill="#00A6FF" font-family="'ArialMT'" font-size="55.7107px">W</text>
+
+    <!-- Objects -->
+    {% for p in params %}
+      <text transform="matrix(1 0 0 1 {{p.coordinates[0]}} {{p.coordinates[1]}})"  class="m{{ p.magnitude | int }}" font-family="'ArialMT'" font-size="40.2209px">{{p.name}}</text>
+    {% endfor %}
+
+    <!-- <text transform="matrix(1 0 0 1 1777.6572 1542.3105)" class="18" font-family="'ArialMT'" font-size="40.2209px">asdf</text>
+    <text transform="matrix(1 0 0 1 1777.6572 1542.3105)" fill="#FFBC00" font-family="'ArialMT'" font-size="40.2209px">asdf</text>
+    <text text-anchor="middle" alignment-baseline="middle" transform="matrix(1 0 0 1 1250.0 1250.0)" fill="#FFBC00" font-family="'ArialMT'" font-size="40.2209px">object center test</text>
+    <text transform="matrix(1 0 0 1 1342.8037 1975.0801)" fill="#FF6700" font-family="'ArialMT'" font-size="40.2209px">Nb5Y44</text>
+    <text transform="matrix(1 0 0 1 1482.1768 1918.6348)" fill="#CEFF00" font-family="'ArialMT'" font-size="40.2209px">JDZ54uY</text>
+    <text transform="matrix(1 0 0 1 494.3052 1612.873)" fill="#FF0055" font-family="'ArialMT'" font-size="40.2209px">VSA78cn</text> -->
+
+    <!-- Map / Legend -->
+    <rect x="-1" y="-1" fill="#8800FF" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 45.397)" font-family="'ArialMT'" font-size="39.4408px">22.0 - </text>
+    <rect x="-1" y="60" fill="#F800FF" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 106.3511)" font-family="'ArialMT'" font-size="39.4408px">21.0 - 22.0</text>
+    <rect x="-1" y="120.9" fill="#FF0074" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 167.3047)" font-family="'ArialMT'" font-size="39.4408px">20.0 - 21.0</text>
+    <rect x="-1" y="181.9" fill="#FF9700" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 228.2588)" font-family="'ArialMT'" font-size="39.4408px">19.0 - 20.0</text>
+    <rect x="-1" y="242.8" fill="#FFFF00" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 289.2129)" font-family="'ArialMT'" font-size="39.4408px">18.0 - 19.0</text>
+    <rect x="-1" y="303.8" fill="#CEFF00" width="218" height="61"/>
+    <text transform="matrix(1 0 0 1 15.9932 350.167)" font-family="'ArialMT'" font-size="39.4408px">- 18.0</text>
+    </svg>
+  </body>
+</html>

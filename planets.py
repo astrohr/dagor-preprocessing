@@ -6,6 +6,11 @@ import re
 import logging
 import datetime
 import time
+import winsound
+
+from jinja2 import Environment, FileSystemLoader
+import math
+import itertools
 
 class Planet:
     # planet's current location prediction could be scattered throughout the sky. What is (maxRa, maxDec) (in arc seconds) until we discard the planet
@@ -13,9 +18,11 @@ class Planet:
     # Warn when object is scattered (but don't flag it as discarded)
     maxScatterednessWarning = (1000, 1000)
     # Min score for planet to be worth observing
-    minScore = 80
+    minScore = 50
     # Min Magnitude
     minMagnitude = 22
+    #maxNotSeenDays
+    maxNotSeenDays = 1.2
 
     def __init__(self, info):
         parts = info.split()
@@ -31,11 +38,12 @@ class Planet:
         self.magnitude = float(parts[7])
         # Object not good for observing
         self.discard = False
-
-        # pdb.set_trace()
-        print("\nWorking on: " + self.name)
-
         self.scatterednessUrl = False
+
+    def analyzePlanet(self):
+        # pdb.set_trace()
+        print("\n" + str(datetime.datetime.now()) + " Working on: " + self.name)
+
         self.getEphemerides()
 
         if self.haveWeObserved():
@@ -56,7 +64,10 @@ class Planet:
                 logging.warning('Location of planet ' + self.name + ' is very scattered! (' + str(self.scatteredness[0]) + ', ' + str(self.scatteredness[1]) + ')')
             # pdb.set_trace()
 
-        # TODO: filter not seen > 1.2 days (and added)
+        # filter not seen > 1.2 days
+        if self.notSeenDays > Planet.maxNotSeenDays:
+            self.discard = True
+            logging.warning('Planet ' + self.name + ' discarded. Reason: too long not seen (' + str(self.notSeenDays) + ' days)')
 
         # Get Max Altitude
         # TODO - do something with maximum altitude
@@ -165,12 +176,16 @@ class Planet:
 class Ephemeride:
     # Maximum sun altiude (otherwise we can't observe the planet)
     maxSunAlt = -15
+    # Minimum altitude of object (below can't be seen due to horizon or clouds)
+    minAlt = 20
 
     def __init__(self, info):
         self.line = info
         parts = self.line.split()
         self.date = parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
         self.dateUnix = time.mktime(datetime.datetime.strptime(self.date, "%Y %m %d %H%M").timetuple())
+        # Atimut of object at that time
+        self.azimut = float(parts[14])
         # Altitude of object (above horizon) at that time
         self.alt = float(parts[15])
         # Altitude of sun at the time
@@ -187,6 +202,11 @@ class Ephemeride:
     def isValid(self):
         if self.sunAlt < Ephemeride.maxSunAlt:
             return True
+        if self.alt > Ephemeride.minAlt:
+            return True
+        # pdb.set_trace()
+        if self.dateUnix < Main.endObservationTimestamp:
+            return True
         return False
 
     def getEffectiveMagnitude(self):
@@ -199,32 +219,134 @@ class Ephemeride:
         return round(10 + (self.effMagnitude - 18) * 5, 2)
 
 
+class Map:
+    def __init__(self, planets):
+        renderPlanets = []
+        for planet in planets:
+            if not planet.discard:
+                # pdb.set_trace()
+                renderDict = {}
+                renderDict["name"] = planet.name
+                renderDict["magnitude"] = planet.maxAltitudeEphemeride.magnitude
+
+                # Displacement from center of map
+                radius = (90 - planet.maxAltitudeEphemeride.alt)
+                # Angle of displacement
+                angle = math.radians(planet.maxAltitudeEphemeride.azimut)
+
+                # Convert the radius and angle to X and Y
+                renderDict["coordinates"] = []
+                renderDict["coordinates"].append((1000 * radius * math.sin(angle) / 90) + 1250)
+                renderDict["coordinates"].append(-(1000 * radius * math.cos(angle) / 90) + 1250)
+
+                renderPlanets.append(renderDict)
+
+        env = Environment(loader=FileSystemLoader('.'))
+        template = env.get_template('skymap.template')
+        output = template.render({"params": renderPlanets})
+
+        with open('skymap.html', 'w') as f:
+            f.write(output)
+
+
+
 class Main:
+    # Observation date starts at 11:00 and ends next day at 10:59:59 (for file timestamps, etc)
+    observationDate = datetime.datetime.now() - datetime.timedelta(hours=11)
+    # observation ends next day at 11:00:00 (so we'll discard later observations, etc)
+    endObservationTimestamp = time.mktime((observationDate.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(hours=35)).timetuple())
+
     def __init__(self):
-        self.planets = self.getData()
+        self.planets = []
+        self.repeatMode = True
+        self.beeperOn = False
+        self.firstRun = True
+
+        self.setInitParams()
+        self.getData()
         self.writeToFile()
+        Map(self.planets)
+
+        # pdb.set_trace()
+
+        while self.repeatMode:
+            self.firstRun = False
+            self.beeperOn = True
+            self.getData()
+            time.sleep(60)
+
+
+    def setInitParams(self):
+        repeat = input('Continuous observation True/False (' + str(self.repeatMode) + ')? ')
+        if re.fullmatch(r'(True)|(False)', repeat):
+            if repeat == 'True':
+                self.repeatMode = True
+            else:
+                self.repeatMode = False
+        print('Continuous observation: ' + str(self.repeatMode))
+
+        minScore = input('Minimum score (' + str(Planet.minScore) + ')? ')
+        if minScore.isdigit():
+            Planet.minScore = int(minScore)
+        print('Minimum score: ' + str(Planet.minScore))
+
+        minMagnitude = input('Minimum efective magnitude (' + str(Planet.minMagnitude) + ')? ')
+        if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', minMagnitude):
+            Planet.minMagnitude = float(minMagnitude)
+        print('Minimum efective magnitude: ' + str(Planet.minMagnitude))
+
+        minAlt = input('Minimum altitude (' + str(Ephemeride.minAlt) + ')? ')
+        if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', minAlt):
+            Ephemeride.minAlt = float(minAlt)
+        print('Minimum altitude: ' + str(Ephemeride.minAlt))
+
+        maxScatteredness1 = input('Maximum scateredness in x coordinate (' + str(Planet.maxScatteredness[0]) + ')? ')
+        if maxScatteredness1.isdigit():
+            Planet.maxScatteredness = (int(maxScatteredness1), Planet.maxScatteredness[1])
+        maxScatteredness2 = input('Maximum scateredness in y coordinate (' + str(Planet.maxScatteredness[1]) + ')? ')
+        if maxScatteredness2.isdigit():
+            Planet.maxScatteredness = (Planet.maxScatteredness[0], int(maxScatteredness2))
+        print('Maximum scateredness: (' + str(Planet.maxScatteredness[0]) + ', ' + str(Planet.maxScatteredness[1]) + ')')
+
+        maxNotSeenDays = input('Maximum not seen days (' + str(Planet.maxNotSeenDays) + ')? ')
+        if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', maxNotSeenDays):
+            Planet.maxNotSeenDays = float(maxNotSeenDays)
+        print('Maximum not seen days: ' + str(Planet.maxNotSeenDays))
+
+        maxSunAlt = input('Maximum sun altitude (' + str(Ephemeride.maxSunAlt) + ')? ')
+        if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', maxSunAlt):
+            Ephemeride.maxSunAlt = float(maxSunAlt)
+        print('Maximum sun altitude: ' + str(Ephemeride.maxSunAlt))
+
 
     def getData(self):
         url = "https://www.minorplanetcenter.net/iau/NEO/neocp.txt"
         resp = requests.get(url).text[:-1].split("\n")
-        planets = []
         for planetString in resp:
+        # for planetString in itertools.islice(resp, 0, 4):
             p = Planet(planetString)
-            # TODO: check if planet is OK or discard otherwise
-            planets.append(p)
+            if p.name not in (i.name for i in self.planets):
+                if not self.firstRun:
+                    print("\n=============================================================")
+                p.analyzePlanet()
+                self.planets.append(p)
+                if self.beeperOn:
+                    winsound.Beep(500, 500)
+            else:
+                # print('Plane already known (' + p.name + ')')
+                pass
 
-        return planets
 
     def sortByMaxAlt(self):
         return sorted([p for p in self.planets if not p.discard], key=lambda planet: planet.maxAltitudeEphemeride.dateUnix)
 
 
     def writeToFile(self):
-        logging.warning('Writing output to file')
+        # logging.warning('Writing output to file')
 
         # pdb.set_trace()
 
-        with open(datetime.datetime.now().strftime("%Y-%m-%d") + ".txt", "w") as f:
+        with open(Main.observationDate.strftime("%Y-%m-%d") + ".txt", "w") as f:
             header = """Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
                        h m                                      "/min   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt."""+"\n\n\n"
             f.write(header + "\n")
@@ -244,30 +366,5 @@ class Main:
 # logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-# Get All parameters first
-minScore = input('Minimum score (' + str(Planet.minScore) + ')? ')
-if minScore.isdigit():
-    Planet.minScore = int(minScore)
-print('Minimum score: ' + str(Planet.minScore))
-
-minMagnitude = input('Minimum efective magnitude (' + str(Planet.minMagnitude) + ')? ')
-if minMagnitude.isdigit():
-    Planet.minMagnitude = int(minMagnitude)
-print('Minimum efective magnitude: ' + str(Planet.minMagnitude))
-
-maxScatteredness1 = input('Maximum scateredness in x coordinate (' + str(Planet.maxScatteredness[0]) + ')? ')
-if maxScatteredness1.isdigit():
-    Planet.maxScatteredness = (int(maxScatteredness1), Planet.maxScatteredness[1])
-maxScatteredness2 = input('Maximum scateredness in y coordinate (' + str(Planet.maxScatteredness[1]) + ')? ')
-if maxScatteredness2.isdigit():
-    Planet.maxScatteredness = (Planet.maxScatteredness[0], int(maxScatteredness2))
-print('Maximum scateredness: (' + str(Planet.maxScatteredness[0]) + ', ' + str(Planet.maxScatteredness[1]) + ')')
-
-maxSunAlt = input('Maximum sun altitude (' + str(Ephemeride.maxSunAlt) + ')? ')
-if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', maxSunAlt):
-    Ephemeride.maxSunAlt = float(maxSunAlt)
-print('Maximum sun altitude: ' + str(Ephemeride.maxSunAlt))
-
-
 # Start the program
-planets = Main()
+main = Main()
