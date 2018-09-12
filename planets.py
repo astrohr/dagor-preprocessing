@@ -184,8 +184,8 @@ class Ephemeride:
         parts = self.line.split()
         self.date = parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
         self.dateUnix = time.mktime(datetime.datetime.strptime(self.date, "%Y %m %d %H%M").timetuple())
-        # Atimut of object at that time
-        self.azimut = float(parts[14])
+        # Azimuth of object at that time
+        self.azimuth = float(parts[14])
         # Altitude of object (above horizon) at that time
         self.alt = float(parts[15])
         # Altitude of sun at the time
@@ -232,7 +232,7 @@ class Map:
                 # Displacement from center of map
                 radius = (90 - planet.maxAltitudeEphemeride.alt)
                 # Angle of displacement
-                angle = math.radians(planet.maxAltitudeEphemeride.azimut)
+                angle = math.radians(planet.maxAltitudeEphemeride.azimuth)
 
                 # Convert the radius and angle to X and Y
                 renderDict["coordinates"] = []
@@ -368,3 +368,4 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 # Start the program
 main = Main()
+pdb.set_trace()
