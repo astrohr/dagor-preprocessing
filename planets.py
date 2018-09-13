@@ -12,6 +12,8 @@ from jinja2 import Environment, FileSystemLoader
 import math
 import itertools
 
+from playsound import playsound
+
 class Planet:
     # planet's current location prediction could be scattered throughout the sky. What is (maxRa, maxDec) (in arc seconds) until we discard the planet
     maxScatteredness = (5000, 5000)
@@ -267,9 +269,13 @@ class Main:
         self.writeToFile()
         Map(self.planets)
 
+        print('\nFirst run completed successfully! Now go, play! Make something big!')
+
         # pdb.set_trace()
 
         while self.repeatMode:
+            if self.firstRun:
+                print("\n=============================================================")
             self.firstRun = False
             self.beeperOn = True
             self.getData()
@@ -322,19 +328,28 @@ class Main:
     def getData(self):
         url = "https://www.minorplanetcenter.net/iau/NEO/neocp.txt"
         resp = requests.get(url).text[:-1].split("\n")
+        currentPlanets = []
         for planetString in resp:
         # for planetString in itertools.islice(resp, 0, 4):
             p = Planet(planetString)
+            currentPlanets.append(p.name)
+
             if p.name not in (i.name for i in self.planets):
-                if not self.firstRun:
-                    print("\n=============================================================")
                 p.analyzePlanet()
                 self.planets.append(p)
                 if self.beeperOn:
-                    winsound.Beep(500, 500)
+                    playsound('up.wav')
             else:
                 # print('Plane already known (' + p.name + ')')
                 pass
+
+        # Did any of planets get removed?
+        if not self.firstRun:
+            for i in range(len(self.planets) -1, -1, -1):
+                if self.planets[i].name not in currentPlanets:
+                    print('\n' + str(datetime.datetime.now()) + ' Planet ' + self.planets[i].name + ' was removed!')
+                    del self.planets[i]
+                    playsound('down.wav')
 
 
     def sortByMaxAlt(self):
@@ -368,4 +383,4 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 # Start the program
 main = Main()
-pdb.set_trace()
+# pdb.set_trace()
