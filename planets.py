@@ -84,6 +84,7 @@ class Planet:
             else:
                 self.discard = True
                 logging.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
+            self.nearestToNowEphemeride = self.nearestToNow()
         else:
             self.discard = True
             logging.warning('Planet ' + self.name + ' discarded. Reason: no ephemerides available')
@@ -141,6 +142,16 @@ class Planet:
             return None
         return self.ephemerides[index]
 
+    def nearestToNow(self):
+        secondsFromNow = float("inf")
+        index = None
+
+        for i, eph in enumerate(self.ephemerides):
+            if eph.secondsFromNow < secondsFromNow:
+                secondsFromNow = eph.secondsFromNow
+                index = i
+        return self.ephemerides[i] if index else None
+
     # Have we observed the planet before
     def haveWeObserved(self):
         resp = requests.get(self.observationsUrl)
@@ -188,6 +199,8 @@ class Ephemeride:
         parts = self.line.split()
         self.date = parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
         self.dateUnix = time.mktime(datetime.datetime.strptime(self.date, "%Y %m %d %H%M").timetuple())
+        currentTime = time.mktime(datetime.datetime.now().timetuple())
+        self.secondsFromNow = math.fabs(self.dateUnix - currentTime)
         # Azimuth of object at that time
         self.azimuth = float(parts[14])
         # Altitude of object (above horizon) at that time
@@ -231,16 +244,16 @@ class Map:
     def __init__(self, planets):
         renderPlanets = []
         for planet in planets:
-            if not planet.discard:
+            if not planet.discard and planet.nearestToNowEphemeride:
                 # pdb.set_trace()
                 renderDict = {}
                 renderDict["name"] = planet.name
-                renderDict["magnitude"] = planet.maxAltitudeEphemeride.magnitude
+                renderDict["magnitude"] = planet.nearestToNowEphemeride.magnitude
 
                 # Displacement from center of map
-                radius = (90 - planet.maxAltitudeEphemeride.alt)
+                radius = (90 - planet.nearestToNowEphemeride.alt)
                 # Angle of displacement
-                angle = math.radians(planet.maxAltitudeEphemeride.azimuth)
+                angle = math.radians(planet.nearestToNowEphemeride.azimuth)
 
                 # Convert the radius and angle to X and Y
                 renderDict["coordinates"] = []
@@ -365,7 +378,6 @@ class Main:
 
     def sortByMaxAlt(self):
         return sorted([p for p in self.planets if not p.discard], key=lambda planet: planet.maxAltitudeEphemeride.dateUnix)
-
 
     def writeToFile(self):
         # logging.warning('Writing output to file')
