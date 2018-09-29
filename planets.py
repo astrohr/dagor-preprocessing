@@ -180,6 +180,8 @@ class Ephemeride:
     maxSunAlt = -15
     # Minimum altitude of object (below can't be seen due to horizon or clouds)
     minAlt = 20
+    # Minimum distance of object from the Moon
+    minMoonDistance = 20
 
     def __init__(self, info):
         self.line = info
@@ -192,6 +194,8 @@ class Ephemeride:
         self.alt = float(parts[15])
         # Altitude of sun at the time
         self.sunAlt = float(parts[16])
+        # Distance from the moon
+        self.moonDistance = float(parts[18])
         self.magnitude = float(parts[11])
         # Effective magnitude - Manitude that takes into account atmospheric extiction due to (low) altitude of planet
         self.effMagnitude = self.getEffectiveMagnitude()
@@ -202,14 +206,16 @@ class Ephemeride:
 
 
     def isValid(self):
-        if self.sunAlt < Ephemeride.maxSunAlt:
-            return True
-        if self.alt > Ephemeride.minAlt:
-            return True
-        # pdb.set_trace()
-        if self.dateUnix < Main.endObservationTimestamp:
-            return True
-        return False
+        if self.sunAlt > Ephemeride.maxSunAlt:
+            return False
+        if self.alt < Ephemeride.minAlt:
+            return False
+        if self.moonDistance < Ephemeride.minMoonDistance:
+            return False
+        if self.dateUnix > Main.endObservationTimestamp:
+            return False
+
+        return True
 
     def getEffectiveMagnitude(self):
         if self.alt < 40:
@@ -323,6 +329,11 @@ class Main:
         if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', maxSunAlt):
             Ephemeride.maxSunAlt = float(maxSunAlt)
         print('Maximum sun altitude: ' + str(Ephemeride.maxSunAlt))
+
+        minMoonDistance = input('Minimum distance from the moon (' + str(Ephemeride.minMoonDistance) + ')? ')
+        if re.fullmatch(r'[+-]?[0-9]+\.?[0-9]*', minMoonDistance):
+            Ephemeride.minMoonDistance = float(minMoonDistance)
+        print('Minimum distance from the moon: ' + str(Ephemeride.minMoonDistance))
 
 
     def getData(self):
