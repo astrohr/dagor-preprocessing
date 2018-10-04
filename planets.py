@@ -398,7 +398,10 @@ class Main:
                     if hasattr(p, 'mapLink'):
                         fileLine += ', mapLink=' + p.mapLink
                     f.write(fileLine + "\n")
-                    f.write(p.maxAltitudeEphemeride.line + "\n\n")
+                    # Comment out highest ephemeride
+                    f.write("// " + p.maxAltitudeEphemeride.line + "\n")
+                    # And print current ephemeride
+                    f.write(p.nearestToNowEphemeride.line + "\n\n")
             f.close()
 
 # logger = logging.getLogger()
