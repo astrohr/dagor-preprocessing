@@ -44,7 +44,7 @@ class Planet:
 
     def analyzePlanet(self):
         # pdb.set_trace()
-        print("\n" + str(datetime.datetime.now()) + " Working on: " + self.name)
+        print("\n" + str(datetime.datetime.utcnow()) + " Working on: " + self.name)
 
         self.getEphemerides()
 
@@ -150,7 +150,7 @@ class Planet:
             if eph.secondsFromNow < secondsFromNow:
                 secondsFromNow = eph.secondsFromNow
                 index = i
-        return self.ephemerides[i] if index else None
+        return self.ephemerides[index] if index else None
 
     # Have we observed the planet before
     def haveWeObserved(self):
@@ -273,7 +273,7 @@ class Map:
 
 class Main:
     # Observation date starts at 11:00 and ends next day at 10:59:59 (for file timestamps, etc)
-    observationDate = datetime.datetime.now() - datetime.timedelta(hours=11)
+    observationDate = datetime.datetime.utcnow() - datetime.timedelta(hours=11)
     # observation ends next day at 11:00:00 (so we'll discard later observations, etc)
     endObservationTimestamp = time.mktime((observationDate.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(hours=35)).timetuple())
 
@@ -371,7 +371,7 @@ class Main:
         if not self.firstRun:
             for i in range(len(self.planets) -1, -1, -1):
                 if self.planets[i].name not in currentPlanets:
-                    print('\n' + str(datetime.datetime.now()) + ' Planet ' + self.planets[i].name + ' was removed!')
+                    print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
                     del self.planets[i]
                     playsound('down.wav')
 
