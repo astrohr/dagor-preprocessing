@@ -257,7 +257,7 @@ class Map:
                 # Displacement from center of map
                 radius = (90 - planet.nearestToNowEphemeride.alt)
                 # Angle of displacement
-                angle = math.radians(planet.nearestToNowEphemeride.azimuth)
+                angle = math.radians(planet.nearestToNowEphemeride.azimuth + 180)
 
                 # Convert the radius and angle to X and Y
                 renderDict["coordinates"] = []
