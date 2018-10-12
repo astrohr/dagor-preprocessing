@@ -85,6 +85,7 @@ class Planet:
                 self.discard = True
                 logging.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
             self.nearestToNow()
+            self.currentEphemerideInterpolation()
         else:
             self.discard = True
             logging.warning('Planet ' + self.name + ' discarded. Reason: no ephemerides available')
@@ -152,6 +153,48 @@ class Planet:
                 index = i
         if isinstance(index, int):
             self.nearestToNowEphemeride = self.ephemerides[index]
+            return index
+        return None
+
+    def currentEphemerideInterpolation(self):
+        index = self.nearestToNow()
+        interpolatedEph = Ephemeride(self.ephemerides[index].line)
+
+        if index:
+            eph = Ephemeride(self.ephemerides[index].line)
+            if eph.secondsFromNowPlus600() > 0:
+                if len(self.ephemerides) > index + 1:
+                    currentEph = eph
+                    nextEph = self.ephemerides[index + 1]
+                else:
+                    self.currentInterpolatedEphemeride = eph
+                    return eph
+            elif eph.secondsFromNowPlus600() == 0:
+                self.currentInterpolatedEphemeride = eph
+                return eph
+            else:
+                if index > 0:
+                    currentEph = self.ephemerides[index - 1]
+                    nextEph = eph
+                else:
+                    self.currentInterpolatedEphemeride = eph
+                    return eph
+
+            timeInterval = nextEph.dateUnix - currentEph.dateUnix
+            dt = time.mktime(datetime.datetime.utcnow().timetuple()) + 600 - currentEph.dateUnix
+            dtPerc = dt / timeInterval
+            interpolatedEph.azimuth = currentEph.azimuth + ((nextEph.azimuth - currentEph.azimuth) * dtPerc)
+            interpolatedEph.alt = currentEph.alt + ((nextEph.alt - currentEph.alt) * dtPerc)
+            interpolatedEph.dateUnix = currentEph.dateUnix + dt
+
+            interpolatedEph.updateLineFromData()
+            # print('Interpolated Ephemeride: ')
+            # print(interpolatedEph.line)
+
+            self.currentInterpolatedEphemeride = interpolatedEph
+            return interpolatedEph
+        self.currentInterpolatedEphemeride = None
+        return None
 
     # Have we observed the planet before
     def haveWeObserved(self):
@@ -196,6 +239,9 @@ class Ephemeride:
     minMoonDistance = 20
 
     def __init__(self, info):
+        # Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
+        #            h m                                      "/min   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
+        # 2018 10 12 1900   23 26 39.1 +30 55 48 146.2  22.0    0.22  129.4  289  +62   -28    0.15  114  -03
         self.line = info
         parts = self.line.split()
         self.date = parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
@@ -240,8 +286,21 @@ class Ephemeride:
 
     def secondsFromNowPlus600(self):
         """ Number of seconds from (Now + 600 seconds) """
-        currentTimePlus600 = time.mktime(datetime.datetime.now().timetuple()) + 600
+        currentTimePlus600 = time.mktime(datetime.datetime.utcnow().timetuple()) + 600
         return math.fabs(self.dateUnix - currentTimePlus600)
+
+    def updateLineFromData(self):
+        line = self.line.split(' ')
+        line[0] = datetime.datetime.fromtimestamp(self.dateUnix).strftime("%Y")
+        line[1] = datetime.datetime.fromtimestamp(self.dateUnix).strftime("%m")
+        line[2] = datetime.datetime.fromtimestamp(self.dateUnix).strftime("%d")
+        line[3] = datetime.datetime.fromtimestamp(self.dateUnix).strftime("%H%M")
+
+        # Azimuth & Alititude
+        line[22] = str(round(self.azimuth)).zfill(3)
+        line[24] = str(round(self.alt)) if self.alt < 0 else ('+' + str(round(self.alt)))
+        self.line = ' '.join(line)
+
 
 
 class Map:
@@ -261,7 +320,7 @@ class Map:
 
                 # Convert the radius and angle to X and Y
                 renderDict["coordinates"] = []
-                renderDict["coordinates"].append((1000 * radius * math.sin(angle) / 90) + 1250)
+                renderDict["coordinates"].append(-(1000 * radius * math.sin(angle) / 90) + 1250)
                 renderDict["coordinates"].append(-(1000 * radius * math.cos(angle) / 90) + 1250)
 
                 renderPlanets.append(renderDict)
@@ -382,6 +441,7 @@ class Main:
                 else:
                     # Update the nearest to now ephemeride (so it can be put into file)
                     self.planets[i].nearestToNow()
+                    self.planets[i].currentEphemerideInterpolation()
 
 
     def sortByMaxAlt(self):
@@ -409,7 +469,9 @@ class Main:
                     # Comment out highest ephemeride
                     f.write("// " + p.maxAltitudeEphemeride.line + "\n")
                     # And print current ephemeride
-                    f.write(p.nearestToNowEphemeride.line + "\n\n")
+                    f.write("// " + p.nearestToNowEphemeride.line + "\n")
+                    # And print current interpolated ephemeride
+                    f.write(p.currentInterpolatedEphemeride.line + "\n\n")
             f.close()
 
 # logger = logging.getLogger()
