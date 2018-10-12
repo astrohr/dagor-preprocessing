@@ -84,7 +84,7 @@ class Planet:
             else:
                 self.discard = True
                 logging.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
-            self.nearestToNowEphemeride = self.nearestToNow()
+            self.nearestToNow()
         else:
             self.discard = True
             logging.warning('Planet ' + self.name + ' discarded. Reason: no ephemerides available')
@@ -147,10 +147,11 @@ class Planet:
         index = None
 
         for i, eph in enumerate(self.ephemerides):
-            if eph.secondsFromNow < secondsFromNow:
-                secondsFromNow = eph.secondsFromNow
+            if eph.secondsFromNow() < secondsFromNow:
+                secondsFromNow = eph.secondsFromNow()
                 index = i
-        return self.ephemerides[index] if isinstance(index, int) else None
+        if isinstance(index, int):
+            self.nearestToNowEphemeride = self.ephemerides[index]
 
     # Have we observed the planet before
     def haveWeObserved(self):
@@ -199,8 +200,6 @@ class Ephemeride:
         parts = self.line.split()
         self.date = parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
         self.dateUnix = time.mktime(datetime.datetime.strptime(self.date, "%Y %m %d %H%M").timetuple())
-        currentTime = time.mktime(datetime.datetime.now().timetuple())
-        self.secondsFromNow = math.fabs(self.dateUnix - currentTime)
         # Azimuth of object at that time
         self.azimuth = float(parts[14])
         # Altitude of object (above horizon) at that time
@@ -238,6 +237,10 @@ class Ephemeride:
 
     def getObservationTime(self):
         return round(10 + (self.effMagnitude - 18) * 5, 2)
+
+    def secondsFromNow(self):
+        currentTime = time.mktime(datetime.datetime.now().timetuple())
+        return math.fabs(self.dateUnix - currentTime)
 
 
 class Map:
@@ -299,7 +302,7 @@ class Main:
             self.beeperOn = True
             self.getData()
             self.writeToFile()
-            time.sleep(300)
+            time.sleep(600)
 
 
     def setInitParams(self):
@@ -375,6 +378,9 @@ class Main:
                     print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
                     del self.planets[i]
                     playsound('down.wav')
+                else:
+                    # Update the nearest to now ephemeride (so it can be put into file)
+                    self.planets[i].nearestToNow()
 
 
     def sortByMaxAlt(self):
