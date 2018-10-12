@@ -147,8 +147,8 @@ class Planet:
         index = None
 
         for i, eph in enumerate(self.ephemerides):
-            if eph.secondsFromNow() < secondsFromNow:
-                secondsFromNow = eph.secondsFromNow()
+            if eph.secondsFromNowPlus600() < secondsFromNow:
+                secondsFromNow = eph.secondsFromNowPlus600()
                 index = i
         if isinstance(index, int):
             self.nearestToNowEphemeride = self.ephemerides[index]
@@ -238,9 +238,10 @@ class Ephemeride:
     def getObservationTime(self):
         return round(10 + (self.effMagnitude - 18) * 5, 2)
 
-    def secondsFromNow(self):
-        currentTime = time.mktime(datetime.datetime.now().timetuple())
-        return math.fabs(self.dateUnix - currentTime)
+    def secondsFromNowPlus600(self):
+        """ Number of seconds from (Now + 600 seconds) """
+        currentTimePlus600 = time.mktime(datetime.datetime.now().timetuple()) + 600
+        return math.fabs(self.dateUnix - currentTimePlus600)
 
 
 class Map:
@@ -302,7 +303,7 @@ class Main:
             self.beeperOn = True
             self.getData()
             self.writeToFile()
-            time.sleep(600)
+            time.sleep(300)
 
 
     def setInitParams(self):
