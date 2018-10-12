@@ -150,7 +150,7 @@ class Planet:
             if eph.secondsFromNow < secondsFromNow:
                 secondsFromNow = eph.secondsFromNow
                 index = i
-        return self.ephemerides[index] if index else None
+        return self.ephemerides[index] if isinstance(index, int) else None
 
     # Have we observed the planet before
     def haveWeObserved(self):
@@ -298,7 +298,8 @@ class Main:
             self.firstRun = False
             self.beeperOn = True
             self.getData()
-            time.sleep(60)
+            self.writeToFile()
+            time.sleep(300)
 
 
     def setInitParams(self):
