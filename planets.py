@@ -1,8 +1,10 @@
 import requests
+import requests_cache
 from bs4 import BeautifulSoup
 from lxml import html
 import pdb
 import re
+import sys
 import logging
 import datetime
 import time
@@ -282,6 +284,11 @@ class Main:
     endObservationTimestamp = time.mktime((observationDate.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(hours=35)).timetuple())
 
     def __init__(self):
+        global debugging
+        if debugging:
+            # Cache all server responses to make faster development
+            requests_cache.install_cache('reqeusts-cache', allowable_methods=('GET', 'POST'))
+
         self.planets = []
         self.repeatMode = True
         self.beeperOn = False
@@ -411,6 +418,10 @@ class Main:
                     # And print current ephemeride
                     f.write(p.nearestToNowEphemeride.line + "\n\n")
             f.close()
+
+debugging = False
+if '--debug' in sys.argv:
+    debugging = True
 
 # logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO, format="%(message)s")
