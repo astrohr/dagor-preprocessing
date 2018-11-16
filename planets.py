@@ -1,8 +1,10 @@
 import requests
+import requests_cache
 from bs4 import BeautifulSoup
 from lxml import html
 import pdb
 import re
+import sys
 import logging
 import datetime
 import time
@@ -213,7 +215,7 @@ class Planet:
         html = BeautifulSoup(resp, "html5lib")
         links = html.find("pre")
 
-        observationPoints = re.findall('([+-][0-9]+) +([+-][0-9]+)', links.text)
+        observationPoints = re.findall(r'([+-][0-9]+) +([+-][0-9]+).*Ephemeris #  [0-9]+$', links.text, re.M)
         minRa, maxRa, minDec, maxDec = 0, 0, 0, 0
         for point in observationPoints:
             if int(point[0]) < minRa:
@@ -341,6 +343,11 @@ class Main:
     endObservationTimestamp = time.mktime((observationDate.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(hours=35)).timetuple())
 
     def __init__(self):
+        global debugging
+        if debugging:
+            # Cache all server responses to make faster development
+            requests_cache.install_cache('reqeusts-cache', allowable_methods=('GET', 'POST'))
+
         self.planets = []
         self.repeatMode = True
         self.beeperOn = False
@@ -473,6 +480,10 @@ class Main:
                     # And print current interpolated ephemeride
                     f.write(p.currentInterpolatedEphemeride.line + "\n\n")
             f.close()
+
+debugging = False
+if '--debug' in sys.argv:
+    debugging = True
 
 # logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO, format="%(message)s")
