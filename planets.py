@@ -170,7 +170,7 @@ class Planet:
         html = BeautifulSoup(resp, "html5lib")
         links = html.find("pre")
 
-        observationPoints = re.findall('([+-][0-9]+) +([+-][0-9]+)', links.text)
+        observationPoints = re.findall(r'([+-][0-9]+) +([+-][0-9]+).*Ephemeris #  [0-9]+$', links.text, re.M)
         minRa, maxRa, minDec, maxDec = 0, 0, 0, 0
         for point in observationPoints:
             if int(point[0]) < minRa:
