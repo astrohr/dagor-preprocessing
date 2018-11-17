@@ -22,11 +22,11 @@ class Planet:
     # Warn when object is scattered (but don't flag it as discarded)
     maxScatterednessWarning = (1000, 800)
     # Min score for planet to be worth observing
-    minScore = 50
+    minScore = 25
     # Min Magnitude
     minMagnitude = 22
     #maxNotSeenDays
-    maxNotSeenDays = 1.2
+    maxNotSeenDays = 4
 
     def __init__(self, info):
         parts = info.split()
@@ -236,7 +236,7 @@ class Ephemeride:
     # Maximum sun altiude (otherwise we can't observe the planet)
     maxSunAlt = -15
     # Minimum altitude of object (below can't be seen due to horizon or clouds)
-    minAlt = 20
+    minAlt = 15
     # Minimum distance of object from the Moon
     minMoonDistance = 20
     # Minimum motion (speed = "/min)
