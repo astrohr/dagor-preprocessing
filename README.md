@@ -8,7 +8,7 @@ Make sure you have Python installed . For example: install [Anaconda package](ht
 Install missing dependencies (in python command line)
 
 ```
-pip install playsound
+pip install playsound requests_cache
 ```
 
 ### Running
