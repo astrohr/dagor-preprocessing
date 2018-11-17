@@ -18,9 +18,9 @@ from playsound import playsound
 
 class Planet:
     # planet's current location prediction could be scattered throughout the sky. What is (maxRa, maxDec) (in arc seconds) until we discard the planet
-    maxScatteredness = (5000, 5000)
+    maxScatteredness = (1500, 1000)
     # Warn when object is scattered (but don't flag it as discarded)
-    maxScatterednessWarning = (1000, 1000)
+    maxScatterednessWarning = (1000, 800)
     # Min score for planet to be worth observing
     minScore = 50
     # Min Magnitude
@@ -82,7 +82,7 @@ class Planet:
                 # print("Max Altitude Date: " + self.maxAltitudeEphemeride.date)
                 if self.maxAltitudeEphemeride.effMagnitude > Planet.minMagnitude:
                     self.discard = True
-                    logging.warning('Planet ' + self.name + ' discarded. Reason: effective magnitude too low (' + str(self.maxAltitudeEphemeride.effMagnitude) + ')' + ' Absolute magnitude (' + str(self.maxAltitudeEphemeride.magnitude) + ')')
+                    logging.warning('Planet ' + self.name + ' discarded. Reason: effective magnitude too low (' + str(self.maxAltitudeEphemeride.effMagnitude) + ')' + ' Magnitude (' + str(self.maxAltitudeEphemeride.magnitude) + ')')
             else:
                 self.discard = True
                 logging.warning('Planet ' + self.name + ' discarded. Reason: no maximum altitude obtained')
@@ -239,6 +239,8 @@ class Ephemeride:
     minAlt = 20
     # Minimum distance of object from the Moon
     minMoonDistance = 20
+    # Minimum motion (speed = "/min)
+    minMotion = 2.5
 
     def __init__(self, info):
         # Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
@@ -259,6 +261,7 @@ class Ephemeride:
         self.magnitude = float(parts[11])
         # Effective magnitude - Manitude that takes into account atmospheric extiction due to (low) altitude of planet
         self.effMagnitude = self.getEffectiveMagnitude()
+        self.motion = float(parts[12])
         # Observation time needed (in minutes) - approximates the imaging time needed to get a good picture
         self.observationTime = self.getObservationTime()
         # pdb.set_trace()
@@ -273,6 +276,8 @@ class Ephemeride:
         if self.moonDistance < Ephemeride.minMoonDistance:
             return False
         if self.dateUnix > Main.endObservationTimestamp:
+            return False
+        if self.motion < Ephemeride.minMotion:
             return False
 
         return True
@@ -419,6 +424,11 @@ class Main:
             Ephemeride.minMoonDistance = float(minMoonDistance)
         print('Minimum distance from the moon: ' + str(Ephemeride.minMoonDistance))
 
+        minMotion = input('Minimum motion (speed) (' + str(Ephemeride.minMotion) + ')? ')
+        if re.fullmatch(r'[0-9]+\.?[0-9]*', minMotion):
+            Ephemeride.minMotion = float(minMotion)
+        print('Minimum motion (speed): ' + str(Ephemeride.minMotion))
+
 
     def getData(self):
         url = "https://www.minorplanetcenter.net/iau/NEO/neocp.txt"
@@ -445,7 +455,7 @@ class Main:
                     print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
                     del self.planets[i]
                     playsound('down.wav')
-                else:
+                elif not self.planets[i].discard:
                     # Update the nearest to now ephemeride (so it can be put into file)
                     self.planets[i].nearestToNow()
                     self.planets[i].currentEphemerideInterpolation()
@@ -478,7 +488,10 @@ class Main:
                     # And print current ephemeride
                     f.write("// " + p.nearestToNowEphemeride.line + "\n")
                     # And print current interpolated ephemeride
-                    f.write(p.currentInterpolatedEphemeride.line + "\n\n")
+                    if p.currentInterpolatedEphemeride:
+                        f.write(p.currentInterpolatedEphemeride.line + "\n\n")
+                    else:
+                        f.write(p.nearestToNowEphemeride.line + "\n\n")
             f.close()
 
 debugging = False
