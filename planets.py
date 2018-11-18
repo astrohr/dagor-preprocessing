@@ -452,9 +452,10 @@ class Main:
         if not self.firstRun:
             for i in range(len(self.planets) -1, -1, -1):
                 if self.planets[i].name not in currentPlanets:
-                    print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
                     del self.planets[i]
-                    playsound('down.wav')
+                    if not self.planets[i].discad:
+                        print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
+                        playsound('down.wav')
                 elif not self.planets[i].discard:
                     # Update the nearest to now ephemeride (so it can be put into file)
                     self.planets[i].nearestToNow()
