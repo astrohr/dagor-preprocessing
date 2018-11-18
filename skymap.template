@@ -15,6 +15,7 @@
       svg text {
         text-anchor: middle;
         alignment-baseline: middle;
+        font-size: 30px;
       }
       .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9, .m10, .m11, .m12, .m13, .m14, .m15, .m16, .m17 {
         fill: #CEFF00; 
@@ -59,7 +60,7 @@
 
     <!-- Objects -->
     {% for p in params %}
-      <text transform="matrix(1 0 0 1 {{p.coordinates[0]}} {{p.coordinates[1]}})"  class="m{{ p.magnitude | int }}" font-family="'ArialMT'" font-size="40.2209px">{{p.name}}</text>
+      <text transform="matrix(1 0 0 1 {{p.coordinates[0]}} {{p.coordinates[1]}})"  class="m{{ p.magnitude | int }}" font-family="'ArialMT'">{{p.name}}</text>
     {% endfor %}
 
     <!-- <text transform="matrix(1 0 0 1 1777.6572 1542.3105)" class="18" font-family="'ArialMT'" font-size="40.2209px">asdf</text>
