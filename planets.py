@@ -453,7 +453,7 @@ class Main:
             for i in range(len(self.planets) -1, -1, -1):
                 if self.planets[i].name not in currentPlanets:
                     del self.planets[i]
-                    if not self.planets[i].discad:
+                    if not self.planets[i].discard:
                         print('\n' + str(datetime.datetime.utcnow()) + ' Planet ' + self.planets[i].name + ' was removed!')
                         playsound('down.wav')
                 elif not self.planets[i].discard:
