@@ -314,16 +314,16 @@ class Map:
     def __init__(self, planets):
         renderPlanets = []
         for planet in planets:
-            if not planet.discard and planet.nearestToNowEphemeride:
+            if not planet.discard and planet.currentInterpolatedEphemeride:
                 # pdb.set_trace()
                 renderDict = {}
                 renderDict["name"] = planet.name
-                renderDict["magnitude"] = planet.nearestToNowEphemeride.magnitude
+                renderDict["magnitude"] = planet.currentInterpolatedEphemeride.magnitude
 
                 # Displacement from center of map
-                radius = (90 - planet.nearestToNowEphemeride.alt)
+                radius = (90 - planet.currentInterpolatedEphemeride.alt)
                 # Angle of displacement
-                angle = math.radians(planet.nearestToNowEphemeride.azimuth + 180)
+                angle = math.radians(planet.currentInterpolatedEphemeride.azimuth + 180)
 
                 # Convert the radius and angle to X and Y
                 renderDict["coordinates"] = []
@@ -374,6 +374,7 @@ class Main:
             self.beeperOn = True
             self.getData()
             self.writeToFile()
+            Map(self.planets)
             time.sleep(300)
 
 
