@@ -133,7 +133,8 @@ class PlanningTool(object):
         self.new_x = None
         self.new_y = None
 
-        # Where the selected rectangle positions are saved
+        # Where the selected rectangle positions and names are saved
+        self.name_arr = []
         self.x_arr = []
         self.y_arr = []
 
@@ -185,8 +186,22 @@ class PlanningTool(object):
         self.x_arr.append(x_sel)
         self.y_arr.append(y_sel)
 
+        # Get the object name
+        for i, object_i in enumerate(self.object_dict):
+            val_arr = self.object_dict[object_i]
+            ra_arr, dec_arr = val_arr[1], val_arr[2]
+            ra_avg = np.average(ra_arr)
+            dec_avg = np.average(dec_arr)
+
+            if ra_avg > self.ra_min and ra_avg < self.ra_max and \
+                dec_avg > self.dec_min and dec_avg < self.dec_max:
+
+                self.name_arr.append(object_i)
+                break
+
         # Save the arrays
-        np.savetxt(self.save_dir + self.save_name, np.c_[self.x_arr, self.y_arr])
+        np.savetxt(self.save_dir + self.save_name, np.c_[self.name_arr, self.x_arr, self.y_arr], \
+            fmt='%7.7s %9.9s %9.9s')
 
         # Draw selected rectangle
         rect = Rectangle((x_sel - self.x_off, y_sel - self.y_off), self.x_span, self.y_span, \
