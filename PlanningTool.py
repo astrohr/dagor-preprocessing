@@ -19,56 +19,66 @@ query_name = 'query.txt'
 save_dir = cal_dir
 save_name = 'saved_coordinates.txt'
 
-'''
-# Ask the user for plot borders, and limiting magnitude
-print('All further input values will be required in DEGREES!')
-ra_min = float(input('Minimum RA: '))
-ra_max = float(input('Maximum RA: '))
-
-dec_min = float(input('Minimum Dec: '))
-dec_max = float(input('Maximum Dec: '))
-
+# Ask the user for limiting magnitude and FOV size
 lim_mag = float(input('Limiting mag: '))
+x_span = float(input('Horizontal FOV size (degrees): '))
+y_span = float(input('Vertical FOV size (degrees): '))
 
-x_span = float(input('Horizontal FOV size: '))
-y_span = float(input('Vertical FOV size: '))
-'''
+def findPlotBorders(object_dict):
+    """ Find the minimum and maximum RA and Dec from an object_dict dictionary. """
 
-ra_min, ra_max = 105, 108.5
-dec_min, dec_max = 21.7, 25
+    # Init heaps
+    ra_arr = []
+    dec_arr = []
 
-lim_mag = 11.5
-x_span, y_span = 0.7317, 0.7317
+    # Get all dictionary values
+    values = object_dict.values()
+
+    # Fill heaps
+    for arr in values:
+        ra_arr.extend(arr[1])
+        dec_arr.extend(arr[2])
+
+    # Find min and max of both RA and Dec
+    ra_min, ra_max = min(ra_arr), max(ra_arr)
+    dec_min, dec_max = min(dec_arr), max(dec_arr)
+
+    # Expand plot borders by 20%
+    ra_min -= (ra_max - ra_min) * 0.1
+    ra_max += (ra_max - ra_min) * 0.1
+
+    dec_min -= (dec_max - dec_min) * 0.1
+    dec_max += (dec_max - dec_min) * 0.1
+
+    # Return the values
+    return ra_min, ra_max, dec_min, dec_max
+
 
 class PlanningTool(object):
 
-    def __init__(self, cal_dir, cal_name, query_dir, query_name, save_dir, save_name, ra_min, ra_max, dec_min, dec_max, \
-        x_span, y_span):
+    def __init__(self, cal_dir, cal_name, query_dir, query_name, save_dir, save_name, x_span, y_span):
 
+        # Load the query
+        self.object_dict = rquer.readQuery(query_dir, query_name)
+
+        # Init parameters
         self.save_dir = save_dir
         self.save_name = save_name
 
-        self.ra_min = ra_min
-        self.ra_max = ra_max
-
-        self.dec_min = dec_min
-        self.dec_max = dec_max
-
         self.x_span = x_span
         self.y_span = y_span
+
+        # Find the plot limits
+        self.ra_min, self.ra_max, self.dec_min, self.dec_max = findPlotBorders(self.object_dict)
 
         # Load the catalog
         self.star_catalog = rcal.loadGaiaCatalog(cal_dir, cal_name, lim_mag=lim_mag, ra_min=self.ra_min, \
             ra_max=self.ra_max, dec_min=self.dec_min, dec_max=self.dec_max)
 
-        # Load the query
-        self.object_dict = rquer.readQuery(query_dir, query_name)
-
         # Construct color array
         color_arr = cm.nipy_spectral(np.linspace(0.2, 1, len(self.object_dict)))
         color_order = random.sample(range(len(color_arr)), len(color_arr))
         self.color_arr = color_arr[color_order]
-
 
         # Init plot
         self.fig = plt.figure()
@@ -78,31 +88,27 @@ class PlanningTool(object):
         self.ax.scatter(self.star_catalog[:, 0], self.star_catalog[:, 1], \
             s=(2.512**(-self.star_catalog[:, 2])*1000), color='black')
 
-        print(self.object_dict)
 
         # Plot asteroids
         for i, object_i in enumerate(self.object_dict):
             
-            date_str_arr, ra_arr, dec_arr = self.object_dict[object_i]
+            # Extract coordinates and data
+            date_str_arr, ra_arr, dec_arr, pa_arr = self.object_dict[object_i]
             color = self.color_arr[i]
 
             for i, date_str, ra, dec in zip(range(len(date_str_arr)), date_str_arr, ra_arr, dec_arr):
-                if ra > ra_min and ra < ra_max and dec > dec_min and dec < dec_max:
-                    if i == 0:
-                        self.ax.scatter(ra, dec, c=color, marker='x', label=object_i)
-                    else:
-                        self.ax.scatter(ra, dec, c=color, marker='x')
-                    self.ax.annotate(date_str[4:], (ra, dec), xycoords='data', color='r')
 
-            '''
-            if min(ra_arr) > ra_min and max(ra_arr) < ra_max and min(dec_arr) > dec_min and max(dec_arr) < dec_max:
-                self.ax.scatter(ra_arr, dec_arr, c=color, marker='x', label=object_i)
-                self.ax.annotate(date_str_arr, (ra_arr, dec_arr), xycoords='data')
-            '''
+                # Scatter plot, label only if this is the first object in the series              
+                if i == 0:
+                    self.ax.scatter(ra, dec, c=color, marker='x', label=object_i)
+                else:
+                    self.ax.scatter(ra, dec, c=color, marker='x')
+                self.ax.annotate(date_str, (ra, dec), xycoords='data', color='r')
+
 
         # Label axes
-        self.ax.set_xlabel('RA')
-        self.ax.set_ylabel('Dec')
+        self.ax.set_xlabel('RA [deg]')
+        self.ax.set_ylabel('Dec [deg]')
 
         # Legend
         self.legend = self.ax.legend(loc='upper right', fontsize='x-small')
@@ -136,12 +142,11 @@ class PlanningTool(object):
         # Register mouse/keyboard events
         self.ax.figure.canvas.mpl_connect('motion_notify_event', self.onMouseMotion)
         self.ax.figure.canvas.mpl_connect('button_press_event', self.onMousePress)
-        # self.ax.figure.canvas.mpl_connect('key_press_event', self.onKeyPress)
-        # self.ax.figure.canvas.mpl_connect('key_release_event', self.onKeyRelease)
         
         # Set tight layout
         self.fig.tight_layout()
         self.ax.margins(0)
+        self.ax.set_aspect('equal')
         self.ax.figure.canvas.draw()
 
 
@@ -193,5 +198,5 @@ class PlanningTool(object):
         self.ax.figure.canvas.draw()
 
 
-pln = PlanningTool(cal_dir, cal_name, query_dir, query_name, save_dir, save_name, ra_min, ra_max, dec_min, dec_max, x_span, y_span)
+pln = PlanningTool(cal_dir, cal_name, query_dir, query_name, save_dir, save_name, x_span, y_span)
 plt.show()
