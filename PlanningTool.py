@@ -43,12 +43,19 @@ def findPlotBorders(object_dict):
     ra_min, ra_max = min(ra_arr), max(ra_arr)
     dec_min, dec_max = min(dec_arr), max(dec_arr)
 
-    # Expand plot borders by 20%
-    ra_min -= (ra_max - ra_min) * 0.1
-    ra_max += (ra_max - ra_min) * 0.1
+    # Averages
+    ra_avg = np.average(ra_arr)
+    dec_avg = np.average(dec_arr)
 
-    dec_min -= (dec_max - dec_min) * 0.1
-    dec_max += (dec_max - dec_min) * 0.1
+    # Find the maximum span
+    span_max = max(ra_max - ra_min, dec_max - dec_min) * 1.2
+
+    # Redo the min and max
+    ra_min = ra_avg - span_max/2
+    ra_max = ra_avg + span_max/2
+
+    dec_min = dec_avg - span_max/2
+    dec_max = dec_avg + span_max/2
 
     # Return the values
     return ra_min, ra_max, dec_min, dec_max
