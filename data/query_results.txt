@@ -1,5 +1,5 @@
 Object 1 :      VXt0001
-VXt0001            Prepared 2018 Dec. 31.711 UT  From Väisälä orbit
+VXt0001            Prepared 2018 Dec. 31.729 UT  From Väisälä orbit
 Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Sun         Moon
                                                      °/day   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
 2018 12 31 17    07.1689  +23.322    173.6  19.3      0.51  228.1  247  +11   -15    0.26  110  -46
@@ -8,7 +8,7 @@ Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Su
 2018 12 31 23    07.1618  +23.237    173.9  19.3      0.53  228.9  340  +67   -68    0.24  113  -29
 
 Object 2 :      VXt0002
-VXt0002            Prepared 2018 Dec. 31.711 UT  From Väisälä orbit
+VXt0002            Prepared 2018 Dec. 31.729 UT  From Väisälä orbit
 Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Sun         Moon
                                                      °/day   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
 2018 12 31 17    07.1230  +23.901    174.2  21.6      0.23  266.9  247  +11   -15    0.26  110  -46
@@ -17,7 +17,7 @@ Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Su
 2018 12 31 23    07.1188  +23.898    174.5  21.6      0.23  266.4  341  +68   -68    0.24  114  -29
 
 Object 3 :      VXt0003
-VXt0003            Prepared 2018 Dec. 31.711 UT  From Väisälä orbit
+VXt0003            Prepared 2018 Dec. 31.729 UT  From Väisälä orbit
 Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Sun         Moon
                                                      °/day   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
 2018 12 31 17    07.0853  +24.123    174.7  20.7      0.21  266.3  248  +12   -15    0.26  111  -46
@@ -26,7 +26,7 @@ Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Su
 2018 12 31 23    07.0814  +24.120    175.0  20.7      0.22  265.9  342  +68   -68    0.24  114  -29
 
 Object  4 :      VXt0004
-VXt0004            Prepared 2018 Dec. 31.711 UT  From Väisälä orbit
+VXt0004            Prepared 2018 Dec. 31.729 UT  From Väisälä orbit
 Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Sun         Moon
                                                      °/day   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
 2018 12 31 17    07.0955  +23.928    174.5  21.1      0.27  293.9  248  +12   -15    0.26  111  -46

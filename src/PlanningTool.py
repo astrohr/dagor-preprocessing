@@ -60,6 +60,8 @@ class PlanningTool(object):
         # Load the query
         self.object_dict = rquer.readQuery(query_dir, query_name)
 
+        # print(self.object_dict)
+
         # Init parameters
         self.save_dir = save_dir
         self.save_name = save_name

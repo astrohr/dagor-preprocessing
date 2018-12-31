@@ -44,11 +44,11 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     
     # Create soup
     soup = BeautifulSoup(req.text, "html5lib")
-    
-    print(soup)
 
     # Form return string
     ret_str = '\n'.join(soup.get_text().splitlines()[11:-7])
+
+    print(ret_str)
     
     return ret_str
 

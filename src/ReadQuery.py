@@ -64,7 +64,7 @@ def readQuery(query_dir, query_name):
 				
 				# Extract the object string
 				line = line.strip()
-				new_object = line[11:len(line)]
+				new_object = line[16:len(line)]
 				
 				borders.append(i)
 				objects.append(new_object)
@@ -82,10 +82,10 @@ def readQuery(query_dir, query_name):
 		border_a = borders[i]
 		border_b = borders[i + 1]
 
-		ranges.append((border_a + 8, border_b - 1))
+		ranges.append((border_a + 5, border_b - 1))
 
 	# Add last range
-	ranges.append((borders[len(borders)-1] + 8, len(lines)))
+	ranges.append((borders[len(borders)-1] + 5, len(lines)))
 
 	# Extract the lines selected by the ranges
 	selected_lines = []
