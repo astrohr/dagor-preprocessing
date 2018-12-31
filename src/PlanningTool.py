@@ -9,7 +9,7 @@ import ReadQuery as rquer
 import FetchData as fdata
 import ParseSaved as pars
 
-from Config.config import *
+from Config import config as cfg
 
 
 def findPlotBorders(object_dict):
@@ -52,7 +52,7 @@ def findPlotBorders(object_dict):
 class PlanningTool(object):
 
     def __init__(self, cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
-        x_span, y_span):
+        x_span, y_span, lim_mag):
 
         # Form the query
         fdata.sData2Query(data_dir, data_name, query_dir, query_name)
@@ -67,11 +67,13 @@ class PlanningTool(object):
         self.x_span = x_span
         self.y_span = y_span
 
+        self.lim_mag = lim_mag
+
         # Find the plot limits
         self.ra_min, self.ra_max, self.dec_min, self.dec_max = findPlotBorders(self.object_dict)
 
         # Load the catalog
-        self.star_catalog = rcal.loadGaiaCatalog(cal_dir, cal_name, lim_mag=lim_mag, ra_min=self.ra_min, \
+        self.star_catalog = rcal.loadGaiaCatalog(cal_dir, cal_name, lim_mag=self.lim_mag, ra_min=self.ra_min, \
             ra_max=self.ra_max, dec_min=self.dec_min, dec_max=self.dec_max)
 
         # Construct color array
@@ -221,11 +223,11 @@ class PlanningTool(object):
 if __name__ == '__main__':
 
     # Create tool instance
-    pln = PlanningTool(CAL_DIR, CAL_NAME, DATA_DIR, DATA_NAME, QUERY_DIR, QUERY_NAME, SAVE_DIR, SAVE_NAME, \
-        X_SPAN, Y_SPAN)
+    pln = PlanningTool(cfg.CAL_DIR, cfg.CAL_NAME, cfg.DATA_DIR, cfg.DATA_NAME, cfg.QUERY_DIR, cfg.QUERY_NAME, cfg.SAVE_DIR, cfg.SAVE_NAME, \
+        cfg.X_SPAN, cfg.Y_SPAN, cfg.LIM_MAG)
 
     # Show plot
     plt.show()
 
     # Convert raw coordinates to telescope format
-    pars.parseRaw(SAVE_DIR, SAVE_NAME, FINAL_DIR, FINAL_NAME)
+    pars.parseRaw(cfg.SAVE_DIR, cfg.SAVE_NAME, cfg.FINAL_DIR, cfg.FINAL_NAME)

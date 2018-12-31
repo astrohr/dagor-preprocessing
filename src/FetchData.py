@@ -3,8 +3,8 @@ from requests import post
 from bs4 import BeautifulSoup
 
 
-def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit='h', eph_pos='h', \
-    mot_disp='m', mot_mode='t'):
+def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit='h', eph_pos='d', \
+    mot_disp='d', mot_mode='t'):
     """
     Arguments:
         mpc_str: [string]  Normal format MPC measurements. 
@@ -13,8 +13,10 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
         eph_num: [int] Number of ephemeris positions to output.
         eph_int: [int] Ephemeris interval. 
         eph_unit: [string] Ephemeris units ("d" for days, "h" for hours). 
-        mot_disp: [string] Ephemeris position format ("h" for truncated sexagesimal, "a" for
+        eph_pos: [string] Ephemeris position format ("h" for truncated sexagesimal, "a" for
             full sexagesimal, "d" for decimal)
+        mot_disp: [string] How the miotion is displayed. "s" for "/sec, "m" for "/min, "h" for "/h, 
+            "d" for deg/day 
         mot_mode: [string] Motion display mode ("t" for total motion and direction, "s" for
             separate. )
     Returns:
@@ -43,7 +45,7 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     # Create soup
     soup = BeautifulSoup(req.text, "html5lib")
     
-    # print(soup)
+    print(soup)
 
     # Form return string
     ret_str = '\n'.join(soup.get_text().splitlines()[11:-7])
@@ -56,7 +58,7 @@ def saveData(ret_str, save_dir, save_name):
     filename = os.path.join(save_dir, save_name)
 
     with open(filename, 'w+') as file:
-        file.write(ret_str)
+        file.write(ret_str.encode('utf-8'))
 
 
 def loadData(data_dir, data_name):

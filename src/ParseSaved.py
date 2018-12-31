@@ -22,7 +22,7 @@ def parseRaw(raw_dir, raw_name, final_dir, final_name):
     with open(raw_fname, 'r') as raw, open(final_fname, 'w+') as final:
 
         for raw_line in raw:
-            name_str, ra_str, dec_str = raw_line.split(" ")
+            name_str, ra_str, dec_str = raw_line.lstrip().split(" ")
             ra_tele, dec_tele = decimalToTele(ra_str, dec_str)
             final.write('* ' + name_str + '\n')
             final.write('2018 12 30 2130   ' + ra_tele + ' ' + dec_tele + '\n')
