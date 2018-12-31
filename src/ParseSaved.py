@@ -3,6 +3,7 @@ from astropy.coordinates import ICRS
 from astropy import units
 
 def decimalToTele(ra_str, dec_str):
+    """ Convert a decimal string representation of equatorial coordinates to truncated sexagesimal. """
 
     ra_deg = float(ra_str)
     dec_deg = float(dec_str)
@@ -15,6 +16,7 @@ def decimalToTele(ra_str, dec_str):
     return ra_tele, dec_tele
 
 def parseRaw(raw_dir, raw_name, final_dir, final_name):
+    """ Parse the raw file containing the saved imaging coordinates. """
 
     raw_fname = os.path.join(raw_dir, raw_name)
     final_fname = os.path.join(final_dir, final_name)
