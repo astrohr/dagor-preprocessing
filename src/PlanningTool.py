@@ -7,6 +7,7 @@ from matplotlib.patches import Rectangle
 import ReadCatalog as rcal
 import ReadQuery as rquer
 import FetchData as fdata
+import ParseSaved as pars
 
 # Location of the star catalog
 cal_dir = '../data/'
@@ -20,14 +21,19 @@ data_name = 'mpc_data.txt'
 query_dir = cal_dir
 query_name = 'query_results.txt'
 
-# Where the imaging coordinates are saved
+# Where the RAW imaging coordinates are saved
 save_dir = cal_dir
 save_name = 'saved_coordinates.txt'
+
+# Where the imaging coordinates IN TELESCOPE FORMAT are saved
+final_dir = cal_dir
+final_name = 'saved_coord_telescope.txt'
 
 # Ask the user for limiting magnitude and FOV size
 lim_mag = float(input('Limiting mag: '))
 x_span = float(input('Horizontal FOV size (degrees): '))
 y_span = float(input('Vertical FOV size (degrees): '))
+
 
 def findPlotBorders(object_dict):
     """ Find the minimum and maximum RA and Dec from an object_dict dictionary. """
@@ -72,7 +78,7 @@ class PlanningTool(object):
         x_span, y_span):
 
         # Form the query
-        fdata.sData2Query(data_dir, data_name, save_dir, save_name)
+        fdata.sData2Query(data_dir, data_name, query_dir, query_name)
 
         # Load the query
         self.object_dict = rquer.readQuery(query_dir, query_name)
@@ -237,9 +243,12 @@ class PlanningTool(object):
 
 if __name__ == '__main__':
 
-    # Instantiate object
+    # Create tool instance
     pln = PlanningTool(cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
         x_span, y_span)
 
     # Show plot
     plt.show()
+
+    # Convert raw coordinates to telescope format
+    pars.parseRaw(save_dir, save_name, final_dir, final_name)

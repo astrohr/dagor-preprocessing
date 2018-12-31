@@ -1,34 +1,38 @@
-def raDeg2H(ra_str):
-    """ Convert string representation of decimal right ascention to sexagesimal right ascention string. """
+import os
+from astropy.coordinates import ICRS
+from astropy import units
+
+def decimalToTele(ra_str, dec_str):
 
     ra_deg = float(ra_str)
-
-    ra_h = int(ra_deg/15)
-    ra_m = int((ra_deg - 15*ra_h)*4)
-    ra_s = (4*ra_deg - 60*ra_h - ra_m)*60
-
-    return ' '.join(list(map(str, [ra_h, ra_m, ra_s])))
-
-
-def decDec2Sim(dec_str):
-    """ Convert string representation of decimal declination to sexagesimal declination string. """
-
     dec_deg = float(dec_str)
 
-    if dec_deg > 0:
-        init = '+'
-    else:
-        init = '-'
+    coord = ICRS(ra_deg*units.degree, dec_deg*units.degree)
 
-    dec_degs = int(dec_deg)
-    dec_min = (dec_deg - dec_degs) * 60
-    dec_mins = int(dec_min)
-    dec_secs = int(dec_min - dec_mins)
+    ra_tele = str(coord.ra.to_string(units.hour, sep=' ', precision=1))
+    dec_tele = str(coord.dec.to_string(units.degree, sep=' ', alwayssign=True, precision=0))
 
-    return init + ' '.join(list(map(str, [dec_degs, dec_mins, dec_secs])))
+    return ra_tele, dec_tele
+
+def parseRaw(raw_dir, raw_name, final_dir, final_name):
+
+    raw_fname = os.path.join(raw_dir, raw_name)
+    final_fname = os.path.join(final_dir, final_name)
+
+    with open(raw_fname, 'r') as raw, open(final_fname, 'w+') as final:
+
+        for raw_line in raw:
+            name_str, ra_str, dec_str = raw_line.split(" ")
+            ra_tele, dec_tele = decimalToTele(ra_str, dec_str)
+            final.write('* ' + name_str + '\n')
+            final.write('2018 12 30 2130   ' + ra_tele + ' ' + dec_tele + '\n')
 
 
 if __name__ == '__main__':
 
-    print(raDeg2H(107.50161))
-    print(decDec2Sim(23.748603))
+    print(decimalToTele('107.50161', '23.748603'))
+
+    raw_dir, raw_name = '../data/', 'saved_coordinates.txt'
+    final_dir, final_name = '../data/', 'saved_coord_telescope.txt'
+
+    parseRaw(raw_dir, raw_name, final_dir, final_name)
