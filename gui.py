@@ -78,10 +78,11 @@ def onFrameConfigure(canvas):
 def populate(specs):
     global objectframe
     global row
+    #global selection
     fr = Frame(objectframe)
     fr.grid(row=row)
-
-    lb = Label(fr, text=specs.get("name").get()) 
+    
+    lb = Label(fr, text=specs.get("name").get())
 
     #row doesn't have to be decreased because it doesn't leave blanks
     qt = Button(fr, text="Remove", command=lambda: fr.destroy())
