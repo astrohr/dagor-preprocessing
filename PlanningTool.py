@@ -108,9 +108,15 @@ class PlanningTool(object):
                 # Scatter plot, label only if this is the first object in the series              
                 if i == 0:
                     self.ax.scatter(ra, dec, c=color, marker='x', label=object_i)
-                else:
+                elif i == 2:
                     self.ax.scatter(ra, dec, c=color, marker='x')
-                self.ax.annotate(date_str, (ra, dec), xycoords='data', color='r')
+                    pa = np.deg2rad(pa_arr[i + 1])
+                    r = np.sqrt((ra - ra_arr[i+1])**2 + (dec-dec_arr[i+1])**2)
+                    self.ax.arrow(ra, dec, r*np.sin(pa), r*np.cos(pa), width=0.01)
+                elif i == 1:
+                    self.ax.scatter(ra, dec, c=color, marker='x')
+                if i != 3:
+                    self.ax.annotate(date_str, (ra, dec), xycoords='data', color='r')
 
 
         # Label axes
