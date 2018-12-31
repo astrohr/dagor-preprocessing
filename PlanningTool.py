@@ -93,7 +93,7 @@ class PlanningTool(object):
 
         # Plot stars
         self.ax.scatter(self.star_catalog[:, 0], self.star_catalog[:, 1], \
-            s=(2.512**(-self.star_catalog[:, 2])*1000), color='black')
+            s=(2.512**(-self.star_catalog[:, 2])*1500), color='black')
 
 
         # Plot asteroids
