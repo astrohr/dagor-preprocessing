@@ -11,6 +11,7 @@ obtained = ""
 
 #Rows (minor planets)
 row = 0
+isRunning = False
 
 config = ConfigParser()
 #Load presets
@@ -50,14 +51,23 @@ def center_window(root, w=WIDTH, h=HEIGHT):
     y = (hs/2) - (h/2)
     root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
 
 def populate(minorPlanet):
     global objectframe
     global row
-    lb = Label(objectframe, text=minorPlanet.name)
+    lb = Label(objectframe, text=minorPlanet.name+str(row)) #debug only
     lb.grid(row=row)
     row += 1
-    
+
+
+def shut(window):
+    global isRunning
+    isRunning = False
+    window.destroy()
 
 def insertText(txt):
     global text
@@ -75,12 +85,22 @@ def downloadNC():
     insertText("obtained:\n"+obtained)
 
 
+
 def addObject():
-    window = Tk()
-    submit = Button(window, text="Submit", command=lambda: populate(mp))
-    submit.pack(side=BOTTOM)
-    center_window(window, 200, 100)
-    window.mainloop()
+    global isRunning
+    #print(isRunning)
+
+    if isRunning:
+        pass
+    else:
+        isRunning = True
+        window = Tk()
+        window.protocol("WM_DELETE_WINDOW", lambda: shut(window))
+
+        submit = Button(window, text="Submit", command=lambda: populate(mp))
+        submit.pack(side=BOTTOM)
+        center_window(window, 200, 100)
+        window.mainloop()
 
 
 """Testing"""
@@ -113,15 +133,15 @@ filterframe.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5)
 buttonframe = Frame(leftframe, bg="SteelBlue3")
 buttonframe.pack(fill=BOTH, side=BOTTOM, expand=True, padx=5, pady=5)
 
-objectcanvas = Canvas(rightframe, bg="yellow", width=500,height=500, scrollregion=(0,0,500,800))
-objectcanvas.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5)
+objectcanvas = Canvas(rightframe, bg="SteelBlue") # width=500,height=500, scrollregion=(0,0,500,800)
+
 
 objectframe = Frame(objectcanvas, bg="DeepSkyBlue4")
-objectframe.pack(side=LEFT, expand=False, padx=5, pady=5)
+#objectframe.pack(side=LEFT, expand=False, padx=5, pady=5)
 
 
-consoleframe = Frame(rightframe, bg="SlateGray2")
-consoleframe.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5)
+consoleframe = Frame(rightframe, bg="SlateGray2", height=200)
+consoleframe.pack(fill=BOTH, side=BOTTOM, expand=False, padx=5, pady=5)
 
 
 #Frames
@@ -268,9 +288,14 @@ add.grid(row=0, column=3, padx=2, pady=2)
 #scroll.pack(side=RIGHT, fill=Y)
 
 #objectcanvas scrollbar
-vsb = Scrollbar(objectcanvas, orient="vertical")
-#objectcanvas.configure(yscrollcommand=vsb.set)
+vsb = Scrollbar(objectcanvas, orient="vertical", command=objectcanvas.yview)
+objectcanvas.configure(yscrollcommand=vsb.set)
+objectcanvas.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5) #expand=False?
+objectcanvas.create_window((4, 4), window=objectframe, anchor="nw")
 vsb.pack(side=RIGHT, fill=Y)
+
+
+objectframe.bind("<Configure>", lambda event, canvas=objectcanvas: onFrameConfigure(objectcanvas))
 
 text = Text(consoleframe)
 text.insert("end", "<<< INITIALIZED!")
