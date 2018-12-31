@@ -48,7 +48,7 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     # Form return string
     ret_str = '\n'.join(soup.get_text().splitlines()[11:-7])
 
-    print(ret_str)
+    # print(ret_str)
     
     return ret_str
 
@@ -73,8 +73,13 @@ def loadData(data_dir, data_name):
 
 def sData2Query(data_dir, data_name, save_dir, save_name):
 
+    print("Loading MPC data...")
     mpc_str = loadData(data_dir, data_name)
+    
+    print("Fetching ephemeris query from IAU MPC...")
     ret_str = fetchData(mpc_str)
+
+    print("Saving query results...")
     saveData(ret_str, save_dir, save_name)
 
 if __name__ == '__main__':

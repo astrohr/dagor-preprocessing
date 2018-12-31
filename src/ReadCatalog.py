@@ -19,6 +19,8 @@ def loadGaiaCatalog(dir_path, file_name, lim_mag=None, ra_min=None, ra_max=None,
 
     file_path = os.path.join(dir_path, file_name)
 
+    print("Loading star catalog...")
+
     # Read the catalog
     results = np.load(file_path, allow_pickle=False)
 

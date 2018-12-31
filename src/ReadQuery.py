@@ -51,6 +51,8 @@ def readQuery(query_dir, query_name):
 	# Get the absolute query path
 	query_path = os.path.join(query_dir, query_name)
 
+	print("Reading query results...")
+
 	# Extract all objects and line indices
 	objects = []
 	borders = []
