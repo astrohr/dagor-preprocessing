@@ -1,12 +1,23 @@
-from tkinter import *
+from tkinter import (
+    Tk, Canvas, Frame, Label, Button,
+    Text, Entry, Checkbutton, Scrollbar,
+    LEFT, RIGHT, TOP, BOTTOM, BOTH,
+    RAISED, FLAT, GROOVE,
+    X, Y
+)
 from configparser import ConfigParser
 from bs4 import BeautifulSoup
 import requests
 WIDTH = 800
 HEIGHT = 600
 
+
+
 #Downloads go here
 obtained = ""
+
+#Filtered & manually added
+selection = []
 
 
 #Rows (minor planets)
@@ -40,6 +51,14 @@ class MinorPlanet:
         self.de = de
         self.v = v
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 """Core functions"""
 def center_window(root, w=WIDTH, h=HEIGHT):
@@ -56,11 +75,18 @@ def onFrameConfigure(canvas):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 
-def populate(minorPlanet):
+def populate(specs):
     global objectframe
     global row
-    lb = Label(objectframe, text=minorPlanet.name+str(row)) #debug only
-    lb.grid(row=row)
+    fr = Frame(objectframe)
+    fr.grid(row=row)
+
+    lb = Label(fr, text=specs.get("name").get()) 
+
+    #row doesn't have to be decreased because it doesn't leave blanks
+    qt = Button(fr, text="Remove", command=lambda: fr.destroy())
+    qt.pack(side=LEFT)
+    lb.pack(side=RIGHT)
     row += 1
 
 
@@ -97,9 +123,18 @@ def addObject():
         window = Tk()
         window.protocol("WM_DELETE_WINDOW", lambda: shut(window))
 
-        submit = Button(window, text="Submit", command=lambda: populate(mp))
-        submit.pack(side=BOTTOM)
-        center_window(window, 200, 100)
+        
+        
+        center_window(window, 300, 200)
+
+        label_name = Label(window, text="Name")
+        entry_name = Entry(window)
+        label_name.grid(row=0, column=0)
+        entry_name.grid(row=0, column=1)
+
+        submit = Button(window, text="Submit", command=lambda: populate({"name": entry_name}))
+        submit.grid(row=5)
+
         window.mainloop()
 
 
@@ -107,40 +142,41 @@ def addObject():
 mp = MinorPlanet("ZTF025c", 25, 33, 19)
 
 
+"""Setup"""
 root = Tk()
-root.configure(background="DeepSkyBlue4")
+#root.configure(background="DeepSkyBlue4")
 
 toolbar = Frame(root, bd=1, relief=RAISED)
 toolbar.pack(side=TOP, fill=X)
 btn1 = Button(toolbar, text="Text", relief=FLAT)
 btn1.pack(side=LEFT)
 
-mainframe = Frame(root, bg="DeepSkyBlue3")
+mainframe = Frame(root)
 mainframe.pack(fill=BOTH, expand=True, padx=5, pady=5)
 
-leftframe = Frame(mainframe, bg="SkyBlue3")
+leftframe = Frame(mainframe)
 leftframe.pack(fill=BOTH, side=LEFT, expand=True, padx=5, pady=5)
 
-rightframe = Frame(mainframe, bg="DodgerBlue3")
+rightframe = Frame(mainframe)
 rightframe.pack(fill=BOTH, side=RIGHT, expand=True, padx=5, pady=5)
 
 
 
-filterframe = Frame(leftframe, bg="cyan4")
+filterframe = Frame(leftframe, bd=1, relief=GROOVE)
 filterframe.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5)
 
 
-buttonframe = Frame(leftframe, bg="SteelBlue3")
+buttonframe = Frame(leftframe, bd=1, relief=GROOVE)
 buttonframe.pack(fill=BOTH, side=BOTTOM, expand=True, padx=5, pady=5)
 
-objectcanvas = Canvas(rightframe, bg="SteelBlue") # width=500,height=500, scrollregion=(0,0,500,800)
+objectcanvas = Canvas(rightframe, bd=1, relief=GROOVE) # width=500,height=500, scrollregion=(0,0,500,800)
 
 
-objectframe = Frame(objectcanvas, bg="DeepSkyBlue4")
+objectframe = Frame(objectcanvas)
 #objectframe.pack(side=LEFT, expand=False, padx=5, pady=5)
 
 
-consoleframe = Frame(rightframe, bg="SlateGray2", height=200)
+consoleframe = Frame(rightframe, height=200)
 consoleframe.pack(fill=BOTH, side=BOTTOM, expand=False, padx=5, pady=5)
 
 
@@ -180,7 +216,7 @@ frame_min_motion_speed.pack(fill=X)
 
 #Frame fillers:
 #Obs code
-label_obs_code = Label(frame_obs_code, text="Obs. code?")
+label_obs_code = Label(frame_obs_code, text="Obs. code")
 label_obs_code.pack(side=LEFT)
 
 entry_obs_code = Entry(frame_obs_code)
@@ -189,7 +225,7 @@ entry_obs_code.pack(side=RIGHT)
 
 
 #Min score
-label_min_score = Label(frame_min_score, text="Min. score?")
+label_min_score = Label(frame_min_score, text="Min. score")
 label_min_score.pack(side=LEFT)
 
 entry_min_score = Entry(frame_min_score)
@@ -198,7 +234,7 @@ entry_min_score.pack(side=RIGHT)
 
 
 #Min ef mag
-label_min_ef_mag = Label(frame_min_ef_mag, text="Min. ef. magnitude?")
+label_min_ef_mag = Label(frame_min_ef_mag, text="Min. ef. magnitude")
 label_min_ef_mag.pack(side=LEFT)
 
 entry_min_ef_mag = Entry(frame_min_ef_mag, text=min_ef_mag)
@@ -207,7 +243,7 @@ entry_min_ef_mag.pack(side=RIGHT)
 
 
 #Min altitude
-label_min_alt = Label(frame_min_alt, text="Min. altitude?")
+label_min_alt = Label(frame_min_alt, text="Min. altitude")
 label_min_alt.pack(side=LEFT)
 
 entry_min_alt = Entry(frame_min_alt)
@@ -216,7 +252,7 @@ entry_min_alt.pack(side=RIGHT)
 
 
 #Max x scat
-label_max_scat_xcoo = Label(frame_max_scat_xcoo, text="Max. scat. in x coordinates?")
+label_max_scat_xcoo = Label(frame_max_scat_xcoo, text="Max. scat. in x coordinates")
 label_max_scat_xcoo.pack(side=LEFT)
 
 entry_max_scat_xcoo = Entry(frame_max_scat_xcoo)
@@ -225,7 +261,7 @@ entry_max_scat_xcoo.pack(side=RIGHT)
 
 
 #Max y scat
-label_max_scat_ycoo = Label(frame_max_scat_ycoo, text="Max. scat. in y coordinates?")
+label_max_scat_ycoo = Label(frame_max_scat_ycoo, text="Max. scat. in y coordinates")
 label_max_scat_ycoo.pack(side=LEFT)
 
 entry_max_scat_ycoo = Entry(frame_max_scat_ycoo)
@@ -236,7 +272,7 @@ entry_max_scat_ycoo.pack(side=RIGHT)
 
 
 #Max sun alt
-label_max_sun_alt = Label(frame_max_sun_alt, text="Max. sun altitude?")
+label_max_sun_alt = Label(frame_max_sun_alt, text="Max. sun altitude")
 label_max_sun_alt.pack(side=LEFT)
 
 entry_max_sun_alt = Entry(frame_max_sun_alt)
@@ -244,7 +280,7 @@ entry_max_sun_alt.insert(0, max_sun_alt)
 entry_max_sun_alt.pack(side=RIGHT)
 
 #Min d from moon (on sky)
-label_min_d_from_moon = Label(frame_min_d_from_moon, text="Min. distance from moon?")
+label_min_d_from_moon = Label(frame_min_d_from_moon, text="Min. distance from moon")
 label_min_d_from_moon.pack(side=LEFT)
 
 entry_min_d_from_moon = Entry(frame_min_d_from_moon)
@@ -253,14 +289,14 @@ entry_min_d_from_moon.pack(side=RIGHT)
 
 
 #Min motion speed (on sky)
-label_min_motion_speed = Label(frame_min_motion_speed, text="Min. motion speed?")
+label_min_motion_speed = Label(frame_min_motion_speed, text="Min. motion speed")
 label_min_motion_speed.pack(side=LEFT)
 
-entry_min_motion_speed = Entry(frame_min_motion_speed, text="Min. motion speed?")
+entry_min_motion_speed = Entry(frame_min_motion_speed, text="Min. motion speed")
 entry_min_motion_speed.insert(0, min_motion_speed)
 entry_min_motion_speed.pack(side=RIGHT)
 
-check = Checkbutton(filterframe, text="Continous observation?")
+check = Checkbutton(filterframe, text="Continous observation")
 if continous != "0":
     check.select()
 check.pack(side=LEFT)
@@ -280,7 +316,12 @@ remove = Button(buttonframe, text="Manual removal")
 remove.grid(row=0, column=2, padx=2, pady=2)
 
 add = Button(buttonframe, text="Manual add", command=addObject)
-add.grid(row=0, column=3, padx=2, pady=2)
+add.grid(row=1, column=0, padx=2, pady=2)
+
+
+#TODO
+export = Button(buttonframe, text="Export logs")
+export.grid(row=1, column=1)
 
 
 #console scrollbar - NOT WORKING, TODO
@@ -290,7 +331,7 @@ add.grid(row=0, column=3, padx=2, pady=2)
 #objectcanvas scrollbar
 vsb = Scrollbar(objectcanvas, orient="vertical", command=objectcanvas.yview)
 objectcanvas.configure(yscrollcommand=vsb.set)
-objectcanvas.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5) #expand=False?
+objectcanvas.pack(fill=BOTH, side=TOP, expand=True, padx=5, pady=5) #expand=False
 objectcanvas.create_window((4, 4), window=objectframe, anchor="nw")
 vsb.pack(side=RIGHT, fill=Y)
 
@@ -302,11 +343,8 @@ text.insert("end", "<<< INITIALIZED!")
 text.pack(side=RIGHT, fill=BOTH, expand=True)
 
 
-#objects
 
-
-
-
+"""Main"""
 
 
 center_window(root)
