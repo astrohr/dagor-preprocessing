@@ -8,7 +8,7 @@ import ReadCatalog as rcal
 import ReadQuery as rquer
 
 # Location of the star catalog
-cal_dir = './'
+cal_dir = '../data/'
 cal_name = 'gaia_dr2_mag_11.5.npy'
 
 # Location of the query
