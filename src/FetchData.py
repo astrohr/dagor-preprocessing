@@ -1,5 +1,7 @@
+import os
 from requests import post
 from bs4 import BeautifulSoup
+
 
 def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit='h', eph_pos='h', \
     mot_disp='m', mot_mode='t'):
@@ -12,7 +14,7 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
         eph_int: [int] Ephemeris interval. 
         eph_unit: [string] Ephemeris units ("d" for days, "h" for hours). 
         mot_disp: [string] Ephemeris position format ("h" for truncated sexagesimal, "a" for
-            full sexagesimal, "d" for decimal)ž
+            full sexagesimal, "d" for decimal)
         mot_mode: [string] Motion display mode ("t" for total motion and direction, "s" for
             separate. )
     Returns:
@@ -41,17 +43,42 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     # Create soup
     soup = BeautifulSoup(req.text, "html5lib")
     
+    # print(soup)
+
     # Form return string
-    ret_str = '\n'.join(soup.get_text().splitlines[11:-7])
+    ret_str = '\n'.join(soup.get_text().splitlines()[11:-7])
     
     return ret_str
 
+def saveData(ret_str, save_dir, save_name):
+    """ Writes a string to a file. """
+
+    filename = os.path.join(save_dir, save_name)
+
+    with open(filename, 'w+') as file:
+        file.write(ret_str)
+
+
+def loadData(data_dir, data_name):
+    """ Loads all data from a file to a string. """
+
+    filename = os.path.join(data_dir, data_name)
+
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    return ''.join(lines)
+
+def sData2Query(data_dir, data_name, save_dir, save_name):
+
+    mpc_str = loadData(data_dir, data_name)
+    ret_str = fetchData(mpc_str)
+    saveData(ret_str, save_dir, save_name)
+
 if __name__ == '__main__':
 
-    mpc = """
-         VXt0001 IC2018 12 29.84223807 13 13.25 +23 57 49.3          19.5 G      L01
-         VXt0001*KC2018 12 29.86135807 13 11.30 +23 57 25.9          19.4 G      L01
-         VXt0001 KC2018 12 29.86408107 13 11.04 +23 57 22.8          19.3 G      L01
-    """
-    soup = fetchData(mpc)
-    print(soup)
+
+    data_dir, data_name = '../data/', 'mpc_data.txt'
+    save_dir, save_name = '../data/', 'query_results.txt'
+
+    sData2Query(data_dir, data_name, save_dir, save_name)

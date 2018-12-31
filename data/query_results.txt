@@ -1,0 +1,6 @@
+Object 1 :          VXt
+The following errors were detected:                                                                                
+Column 13 can contain only a space or an asterisk.
+h                                                                               
+Column 13 can contain only a space or an asterisk.
+You will need to correct these errors before an ephemeris can be supplied.

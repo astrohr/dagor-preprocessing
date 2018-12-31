@@ -6,14 +6,19 @@ from matplotlib.patches import Rectangle
 
 import ReadCatalog as rcal
 import ReadQuery as rquer
+import FetchData as fdata
 
 # Location of the star catalog
 cal_dir = '../data/'
 cal_name = 'gaia_dr2_mag_11.5.npy'
 
-# Location of the query
+# Location of the MPC data
+data_dir = cal_dir
+data_name = 'mpc_data.txt'
+
+# Location of the query results
 query_dir = cal_dir
-query_name = 'query.txt'
+query_name = 'query_results.txt'
 
 # Where the imaging coordinates are saved
 save_dir = cal_dir
@@ -63,7 +68,11 @@ def findPlotBorders(object_dict):
 
 class PlanningTool(object):
 
-    def __init__(self, cal_dir, cal_name, query_dir, query_name, save_dir, save_name, x_span, y_span):
+    def __init__(self, cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
+        x_span, y_span):
+
+        # Form the query
+        fdata.sData2Query(data_dir, data_name, save_dir, save_name)
 
         # Load the query
         self.object_dict = rquer.readQuery(query_dir, query_name)
@@ -226,5 +235,11 @@ class PlanningTool(object):
         self.ax.figure.canvas.draw()
 
 
-pln = PlanningTool(cal_dir, cal_name, query_dir, query_name, save_dir, save_name, x_span, y_span)
-plt.show()
+if __name__ == '__main__':
+
+    # Instantiate object
+    pln = PlanningTool(cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
+        x_span, y_span)
+
+    # Show plot
+    plt.show()
