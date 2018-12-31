@@ -9,30 +9,7 @@ import ReadQuery as rquer
 import FetchData as fdata
 import ParseSaved as pars
 
-# Location of the star catalog
-cal_dir = '../data/'
-cal_name = 'gaia_dr2_mag_11.5.npy'
-
-# Location of the MPC data
-data_dir = cal_dir
-data_name = 'mpc_data.txt'
-
-# Location of the query results
-query_dir = cal_dir
-query_name = 'query_results.txt'
-
-# Where the RAW imaging coordinates are saved
-save_dir = cal_dir
-save_name = 'saved_coordinates.txt'
-
-# Where the imaging coordinates IN TELESCOPE FORMAT are saved
-final_dir = cal_dir
-final_name = 'saved_coord_telescope.txt'
-
-# Ask the user for limiting magnitude and FOV size
-lim_mag = float(input('Limiting mag: '))
-x_span = float(input('Horizontal FOV size (degrees): '))
-y_span = float(input('Vertical FOV size (degrees): '))
+from Config.config import *
 
 
 def findPlotBorders(object_dict):
@@ -244,11 +221,11 @@ class PlanningTool(object):
 if __name__ == '__main__':
 
     # Create tool instance
-    pln = PlanningTool(cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
-        x_span, y_span)
+    pln = PlanningTool(CAL_DIR, CAL_NAME, DATA_DIR, DATA_NAME, QUERY_DIR, QUERY_NAME, SAVE_DIR, SAVE_NAME, \
+        X_SPAN, Y_SPAN)
 
     # Show plot
     plt.show()
 
     # Convert raw coordinates to telescope format
-    pars.parseRaw(save_dir, save_name, final_dir, final_name)
+    pars.parseRaw(SAVE_DIR, SAVE_NAME, FINAL_DIR, FINAL_NAME)
