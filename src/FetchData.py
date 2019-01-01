@@ -1,6 +1,8 @@
 import os
-from requests import post
+import time
+from requests import get, post
 from bs4 import BeautifulSoup
+from astropy.time import Time
 
 
 def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit='h', eph_pos='d', \
@@ -82,10 +84,60 @@ def sData2Query(data_dir, data_name, save_dir, save_name):
     print("Saving query results...")
     saveData(ret_str, save_dir, save_name)
 
+def getUrl(object_i):
+
+    cur_time = time.time()
+    astro_time = Time(cur_time, format='unix')
+    jd = astro_time.jd
+
+    url = 'https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=' + \
+        object_i + '&JD=' + str(jd) + '&Form=Y&Ext=VAR&OC=000&META=apm00'
+
+    return url
+
+
+def getUncertainties(object_i):
+
+    url = getUrl(object_i)
+
+    req = get(url)
+
+    soup = BeautifulSoup(req.text, 'html5lib')
+
+    out_arr = []
+
+    for line in soup.get_text().splitlines()[8:-4]:
+
+        line_spl = line.split()
+
+        ra_off = str(line_spl[0])
+        dec_off = str(line_spl[1])
+
+        color = str(line_spl[-1])
+
+        ra_sign, ra_off = ra_off[0], int(ra_off[0:])
+        dec_sign, dec_off = dec_off[0], int(dec_off[0:])
+
+        if ra_sign == '-':
+            ra_off *= -1
+
+        if dec_sign == '-':
+            dec_off *= -1
+
+        ra_off, dec_off = map(lambda x: float(x)/3600, [ra_off, dec_off])
+
+        out_arr.append((ra_off, dec_off, color))
+
+    return out_arr
+
 if __name__ == '__main__':
 
 
     data_dir, data_name = '../data/', 'mpc_data.txt'
     save_dir, save_name = '../data/', 'query_results.txt'
 
-    sData2Query(data_dir, data_name, save_dir, save_name)
+    # sData2Query(data_dir, data_name, save_dir, save_name)
+
+    uncertainties = getUncertainties('ZTF025s')
+
+    print(uncertainties)
