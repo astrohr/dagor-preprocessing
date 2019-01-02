@@ -123,21 +123,31 @@ def getUncertainties(object_i):
 
     out_arr = []
 
-    for line in soup.get_text().splitlines()[8:-4]:
+    # Check if this orbit/uncertainties exist
+    if str(soup.get_text().splitlines()[6]).startswith("Can't find nominal orbit"):
+        print('Could not find uncertainties for: ', object_i)
 
-        line_spl = line.split()
+    else:
 
-        ra_off = int(str(line_spl[0]))
-        dec_off = int(str(line_spl[1]))
+        for line in soup.get_text().splitlines()[8:-4]:
 
-        sign = str(line_spl[-1])
+            line_spl = line.split()
 
-        ra_off, dec_off = map(lambda x: float(x)/3600, [ra_off, dec_off])
+            ra_off = int(str(line_spl[0]))
+            dec_off = int(str(line_spl[1]))
 
-        out_arr.append([ra_off, dec_off, sign])
+            sign = str(line_spl[-1])
 
-    # Convert to numpy array
-    out_arr = np.asarray(out_arr)
+            # Check if sign is given
+            if sign.startswith('Ephemeris'):
+                sign = '!'
+
+            ra_off, dec_off = map(lambda x: float(x)/3600, [ra_off, dec_off])
+
+            out_arr.append([ra_off, dec_off, sign])
+
+        # Convert to numpy array
+        out_arr = np.asarray(out_arr)
 
     return out_arr
 
