@@ -2,6 +2,20 @@ import os
 from astropy.coordinates import ICRS
 from astropy import units
 
+def parseFinderFile(file_dir, file_name):
+    """ Returns a list of objects from a file written in the planetfinder format. """
+
+    objects_arr = []
+
+    fname = os.path.join(file_dir, file_name)
+
+    with open(fname, 'r') as file:
+        for line in file:
+            if line.startswith('*'):
+                objects_arr.append(line[2:9])
+
+    return objects_arr
+
 def decimalToTele(ra_str, dec_str):
     """ Convert a decimal string representation of equatorial coordinates to truncated sexagesimal. """
 
@@ -28,6 +42,7 @@ def parseRaw(raw_dir, raw_name, final_dir, final_name):
             ra_tele, dec_tele = decimalToTele(ra_str, dec_str)
             final.write('* ' + name_str + '\n')
             final.write('2018 12 30 2130   ' + ra_tele + ' ' + dec_tele + '\n')
+
 
 
 if __name__ == '__main__':

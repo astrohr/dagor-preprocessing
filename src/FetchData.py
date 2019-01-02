@@ -5,6 +5,8 @@ from requests import get, post
 from bs4 import BeautifulSoup
 from astropy.time import Time
 
+import ParseLib as plib
+
 
 def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit='h', eph_pos='d', \
     mot_disp='d', mot_mode='t'):
@@ -168,6 +170,26 @@ def getObservations(object_i):
     lines = soup.get_text().splitlines()
 
     return '\n'.join(lines)
+
+
+def sName2Query(data_dir, data_name, save_dir, save_name):
+    """ Forms a query from a finder file. """
+
+    mpc_str = ''
+
+    objects_arr = plib.parseFinderFile(data_dir, data_name)
+
+    for object_i in objects_arr:
+        lines = getObservations(object_i)
+
+        mpc_str += lines
+
+    print("Fetching ephemeris query from IAU MPC...")
+    ret_str = fetchData(mpc_str)
+
+    print("Saving query results...")
+    saveData(ret_str, save_dir, save_name)
+
 
 if __name__ == '__main__':
 
