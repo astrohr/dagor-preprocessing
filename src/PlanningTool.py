@@ -249,24 +249,35 @@ class PlanningTool(object):
                 # Get current RA and Dec
                 ra_curr, dec_curr = ra_arr[0], dec_arr[0]
 
+                # Convert uncertainties to float
                 ra_uncertainties = uncertainties_arr[:, 0].astype('float')
                 dec_uncertainties = uncertainties_arr[:, 1].astype('float')
                 sign_arr = uncertainties_arr[:, 2]
 
+                # Form colors array
                 color_rgb_arr = []
+
                 for sign in sign_arr:
+                
+                    # Get object color
                     color = self.color_arr[i]
+
+                    # Form lighter and darker color
                     rgb_darker_color = col.to_rgb(color)
                     rgb_lighter_color = list([c + 0.1 for c in rgb_darker_color])
+
                     if sign == '!':
                         color_rgb_arr.append(rgb_darker_color)
+
                     elif sign == '!':
                         color_rgb_arr.append(rgb_lighter_color)
 
 
+                # Add uncertainties to center to get coordinates
                 ra_coords = ra_uncertainties + ra_curr
                 dec_coords = dec_uncertainties + dec_curr
 
+                # Update plot limits
                 self.ax.set_xlim(min(ra_coords), max(ra_coords))
                 self.ax.set_ylim(min(dec_coords), max(dec_coords))
 

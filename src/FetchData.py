@@ -130,13 +130,9 @@ def getUncertainties(object_i):
         ra_off = int(str(line_spl[0]))
         dec_off = int(str(line_spl[1]))
 
-        # print(ra_off, dec_off)
-
         sign = str(line_spl[-1])
 
         ra_off, dec_off = map(lambda x: float(x)/3600, [ra_off, dec_off])
-
-        # print(ra_off, dec_off)
 
         out_arr.append([ra_off, dec_off, sign])
 
