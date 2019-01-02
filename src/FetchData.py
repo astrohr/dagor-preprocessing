@@ -101,7 +101,7 @@ def sData2Query(data_dir, data_name, save_dir, save_name):
     print("Saving query results...")
     saveData(ret_str, save_dir, save_name)
 
-def getUrl(object_i):
+def getUncertaintyUrl(object_i):
 
     cur_time = time.time()
     astro_time = Time(cur_time, format='unix')
@@ -112,10 +112,15 @@ def getUrl(object_i):
 
     return url
 
+def getObservationUrl(object_i):
+
+    url = "https://cgi.minorplanetcenter.net/cgi-bin/showobsorbs.cgi?Obj=" + object_i + "&obs=y"
+
+    return url
 
 def getUncertainties(object_i):
 
-    url = getUrl(object_i)
+    url = getUncertaintyUrl(object_i)
 
     req = get(url)
 
@@ -150,6 +155,19 @@ def getUncertainties(object_i):
         out_arr = np.asarray(out_arr)
 
     return out_arr
+
+def getObservations(object_i):
+    """ Gets observations for a certain object. """
+
+    url = getObservationUrl(object_i)
+
+    req = get(url)
+
+    soup = BeautifulSoup(req.text, 'html5lib')
+
+    lines = soup.get_text().splitlines()
+
+    return '\n'.join(lines)
 
 if __name__ == '__main__':
 
