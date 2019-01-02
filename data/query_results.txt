@@ -1,5 +1,5 @@
 Object 1 :      ZYB10FB
-ZYB10FB            Prepared 2019 Jan.  2.841 UT  From Väisälä orbit
+ZYB10FB            Prepared 2019 Jan.  2.846 UT  From Väisälä orbit
 Date    TT       R. A. (2000) Decl.  Elong.  V         Motion      Object     Sun         Moon
                                                      °/day   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
 2019 01 02 20    12.6063   -2.908     92.4  31.3      0.43  092.2  238  -31   -46    0.10  057  -61

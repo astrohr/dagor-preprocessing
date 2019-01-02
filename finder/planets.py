@@ -1,6 +1,7 @@
 import requests
 import requests_cache
 from bs4 import BeautifulSoup
+import json
 from lxml import html
 import pdb
 import re
@@ -125,10 +126,17 @@ class Planet:
             self.observationsUrl = tree.xpath("//a[text()='observations']/@href")[0]
 
         self.ephemerides = []
+        ephReport = {}
         for l in lines:
             eph = Ephemeride(l)
             if eph.isValid():
                 self.ephemerides.append(eph)
+                ephReport["OK"] = ephReport["OK"] + 1 if "OK" in ephReport else 1
+            else:
+                ephReport[eph.discardReason] = ephReport[eph.discardReason] + 1 if eph.discardReason in ephReport else 1
+        if len(ephReport):
+            print("Ephemerides report: " + json.dumps(ephReport))
+            # print(ephDropReasons)
 
     def maxAlt(self):
         maxAlt = float("-inf")
@@ -241,6 +249,8 @@ class Ephemeride:
     minMoonDistance = 20
     # Minimum motion (speed = "/min)
     minMotion = 2.5
+    # Why did the ephemeride get discarded (if at all)
+    discardReason = ''
 
     def __init__(self, info):
         # Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
@@ -270,14 +280,19 @@ class Ephemeride:
 
     def isValid(self):
         if self.sunAlt > Ephemeride.maxSunAlt:
+            self.discardReason = 'nearSun'
             return False
         if self.alt < Ephemeride.minAlt:
+            self.discardReason = 'altLow'
             return False
         if self.moonDistance < Ephemeride.minMoonDistance:
+            self.discardReason = 'nearMoon'
             return False
         if self.dateUnix > Main.endObservationTimestamp:
+            self.discardReason = 'tooLate'
             return False
         if self.motion < Ephemeride.minMotion:
+            self.discardReason = 'tooSlow'
             return False
 
         return True
@@ -496,13 +511,16 @@ class Main:
                         f.write(p.nearestToNowEphemeride.line + "\n\n")
             f.close()
 
-debugging = False
-if '--debug' in sys.argv:
-    debugging = True
 
-# logger = logging.getLogger()
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-# Start the program
-main = Main()
-# pdb.set_trace()
+if __name__ == "__main__":
+    debugging = False
+    if '--debug' in sys.argv:
+        debugging = True
+
+    # logger = logging.getLogger()
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    # Start the program
+    main = Main()
+    # pdb.set_trace()
