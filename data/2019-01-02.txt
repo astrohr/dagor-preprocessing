@@ -1,0 +1,80 @@
+Date       UT   *  R.A. (J2000) Decl.  Elong.  V        Motion     Object     Sun         Moon
+                       h m                                      "/min   P.A.  Azi. Alt.  Alt.  Phase Dist. Alt.
+
+
+
+* P10KMjR         score=100, obs=4, arc=0.03, notSeen=0.526days, obsExposure=28.0min, scatteredness=(181,164), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KMjR&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2000   02 42 38.5 +14 14 38 120.8  21.6    5.22  037.1  028  +57   -46    0.10  157  -61   Map/Offsets
+// 2019 01 02 2130   02 42 58.1 +14 20 52 120.8  21.6    5.22  037.4  058  +46   -60    0.09  156  -60   Map/Offsets
+2019 01 02 2135   02 42 58.1 +14 20 52 120.8  21.6    5.22  037.4  059  +45   -60    0.09  156  -60   Map/Offsets
+
+* P10KMjQ         score=100, obs=4, arc=0.03, notSeen=0.525days, obsExposure=26.5min, scatteredness=(185,27), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KMjQ&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2000   02 33 34.6 +08 42 53 116.8  21.3    2.97  103.9  028  +51   -46    0.10  153  -61   Map/Offsets
+// 2019 01 02 2130   02 33 52.2 +08 41 48 116.8  21.3    2.99  103.9  056  +40   -60    0.09  153  -60   Map/Offsets
+2019 01 02 2135   02 33 52.2 +08 41 48 116.8  21.3    2.99  103.9  057  +39   -60    0.09  153  -60   Map/Offsets
+
+* P10KLZS         score=100, obs=4, arc=0.04, notSeen=0.568days, obsExposure=28.5min, scatteredness=(146,175), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KLZS&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2000   03 02 55.8 -01 09 08 119.4  21.7    3.03  176.0  014  +43   -46    0.10  154  -61   Map/Offsets
+// 2019 01 02 2130   03 02 57.1 -01 13 40 119.3  21.8    3.03  175.8  042  +35   -60    0.09  153  -60   Map/Offsets
+2019 01 02 2135   03 02 57.1 -01 13 40 119.3  21.8    3.03  175.8  043  +34   -60    0.09  153  -60   Map/Offsets
+
+* P10KKta         score=100, obs=7, arc=1.09, notSeen=0.566days, obsExposure=28.0min
+// 2019 01 02 2000   01 43 52.8 +04 12 08 103.7  21.6    2.99  016.1  042  +41   -46    0.10  140  -61
+// 2019 01 02 2130   01 43 57.8 +04 16 27 103.6  21.6    2.99  016.3  064  +29   -60    0.09  139  -60
+2019 01 02 2135   01 43 57.8 +04 16 27 103.6  21.6    2.99  016.3  065  +28   -60    0.09  139  -60
+
+* P10KO0d         score=100, obs=4, arc=0.04, notSeen=0.426days, obsExposure=17.5min, scatteredness=(221,350), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KO0d&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2130   05 39 41.1 -10 24 12 142.3  20.1   13.32  164.3  352  +34   -60    0.09  146  -60   Map/Offsets
+// 2019 01 02 2130   05 39 41.1 -10 24 12 142.3  20.1   13.32  164.3  352  +34   -60    0.09  146  -60   Map/Offsets
+2019 01 02 2135   05 39 41.1 -10 24 12 142.3  20.1   13.32  164.3  352 289 +34 +34  -60    0.09  146  -60   Map/Offsets
+
+* P10KO0b         score=100, obs=4, arc=0.04, notSeen=0.421days, obsExposure=20.5min, scatteredness=(343,279), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KO0b&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2130   05 45 17.3 -08 38 12 144.5  20.5    7.75  228.2  350  +36   -60    0.09  147  -60   Map/Offsets
+// 2019 01 02 2130   05 45 17.3 -08 38 12 144.5  20.5    7.75  228.2  350  +36   -60    0.09  147  -60   Map/Offsets
+2019 01 02 2135   05 45 17.3 -08 38 12 144.5  20.5    7.75  228.2  287  +36   -60    0.09  147  -60   Map/Offsets
+
+* ZTF027a         score=100, obs=11, arc=2.3, notSeen=0.426days, obsExposure=13.5min
+// 2019 01 02 2130   05 43 25.2 -10 30 59 142.6  19.3   16.78  126.7  351  +34   -60    0.09  145  -60   !
+// 2019 01 02 2130   05 43 25.2 -10 30 59 142.6  19.3   16.78  126.7  351  +34   -60    0.09  145  -60   !
+2019 01 02 2135   05 43 25.2 -10 30 59 142.6  19.3   16.78  126.7  351 288 +34 +34  -60    0.09  145  -60   !
+
+* P10KO0c         score=100, obs=3, arc=0.04, notSeen=0.423days, obsExposure=27.0min, scatteredness=(0,0), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KO0c&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2200   06 01 29.2 -04 24 06 150.0  21.4    6.52  107.2  354  +40   -64    0.09  147  -57   Map/Offsets
+// 2019 01 02 2130   06 01 16.7 -04 23 08 150.0  21.4    6.54  107.3  345  +39   -60    0.09  147  -60   Map/Offsets
+2019 01 02 2135   06 01 16.7 -04 23 08 150.0  21.4    6.54  107.3  347  +39   -60    0.09  147  -60   Map/Offsets
+
+* P10KQ0m         score=100, obs=3, arc=0.02, notSeen=0.338days, obsExposure=26.0min, scatteredness=(171,80), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KQ0m&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2300   07 05 51.2 +30 36 56 171.7  21.2    3.37  338.5  342  +75   -68    0.09  141  -50   Map/Offsets
+// 2019 01 02 2130   07 05 59.8 +30 32 14 171.7  21.2    3.37  338.7  294  +64   -60    0.09  140  -60   Map/Offsets
+2019 01 02 2135   07 05 59.8 +30 32 14 171.7  21.2    3.37  338.7  296  +65   -60    0.09  140  -60   Map/Offsets
+
+* P10KOlA         score=100, obs=4, arc=0.03, notSeen=0.327days, obsExposure=25.5min, scatteredness=(145,141), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KOlA&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2300   06 56 20.2 +29 10 06 173.7  21.1    6.20  204.0  350  +74   -68    0.09  143  -50   Map/Offsets
+// 2019 01 02 2130   06 56 37.5 +29 18 36 173.5  21.1    6.19  204.0  299  +64   -60    0.09  142  -60   Map/Offsets
+2019 01 02 2135   06 56 37.5 +29 18 36 173.5  21.1    6.19  204.0  301  +65   -60    0.09  142  -60   Map/Offsets
+
+* P10KOlB         score=100, obs=4, arc=0.03, notSeen=0.325days, obsExposure=26.0min, scatteredness=(378,62), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KOlB&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 02 2330   07 13 55.4 +33 48 18 168.1  21.2    2.72  130.9  000  +79   -67    0.09  139  -45   Map/Offsets
+// 2019 01 02 2130   07 13 35.5 +33 51 48 168.0  21.2    2.70  129.5  286  +65   -60    0.09  138  -60   Map/Offsets
+2019 01 02 2135   07 13 35.5 +33 51 48 168.0  21.2    2.70  129.5  288  +66   -60    0.09  138  -60   Map/Offsets
+
+* P10KOlE         score=100, obs=3, arc=0.03, notSeen=0.318days, obsExposure=29.0min, scatteredness=(289,82), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KOlE&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 03 0000   07 57 35.4 +28 28 16 164.3  21.8    4.47  036.6  350  +73   -65    0.09  131  -41   Map/Offsets
+// 2019 01 02 2130   07 57 04.6 +28 19 06 164.4  21.8    4.66  036.6  283  +54   -60    0.09  129  -60   Map/Offsets
+2019 01 02 2135   07 57 04.6 +28 19 06 164.4  21.8    4.66  036.6  284  +55   -60    0.09  129  -60   Map/Offsets
+
+* P10KOc7         score=100, obs=4, arc=0.04, notSeen=0.368days, obsExposure=22.5min, scatteredness=(0,0), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KOc7&JD=2458486.333333&Ext=VAR&OC=L01&META=apm11
+// 2019 01 03 0000   07 44 16.5 +50 51 46 150.3  20.5    6.98  172.4  180  +84   -65    0.09  129  -41   Map/Offsets   !
+// 2019 01 02 2130   07 44 01.4 +51 07 47 150.0  20.6    6.01  170.0  243  +65   -60    0.09  128  -60   Map/Offsets   !
+2019 01 02 2135   07 44 01.4 +51 07 47 150.0  20.6    6.01  170.0  243  +66   -60    0.09  128  -60   Map/Offsets   !
+
+* ZYB10FB         score=100, obs=8, arc=0.1, notSeen=2.341days, obsExposure=23.0min, scatteredness=(0,0), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=ZYB10FB&JD=2458486.416667&Ext=VAR&OC=L01&META=apm11
+// 2019 01 03 0200   09 40 34.2 -00 19 17 133.1  20.6   30.41  139.2  001  +45   -49    0.08  102  -20   Map/Offsets   !
+// 2019 01 02 2200   09 35 19.1 +01 11 14 134.8  20.6   29.65  138.6  293  +23   -64    0.09  101  -57   Map/Offsets   !
+2019 01 02 2200   09 35 19.1 +01 11 14 134.8  20.6   29.65  138.6  293  +23   -64    0.09  101  -57   Map/Offsets   !
+
+* P10KOlF         score=100, obs=3, arc=0.02, notSeen=0.234days, obsExposure=19.0min, scatteredness=(206,58), mapLink=https://cgi.minorplanetcenter.net/cgi-bin/uncertaintymap.cgi?Obj=P10KOlF&JD=2458486.541667&Ext=VAR&OC=L01&META=apm11
+// 2019 01 03 0300   11 03 47.3 -15 41 41 107.5  20.9    3.55  062.8  355  +29   -38    0.08  078  -11   Map/Offsets
+// 2019 01 03 0100   11 03 21.0 -15 44 54 107.5  20.9    3.55  063.2  324  +21   -58    0.09  077  -31   Map/Offsets
+2019 01 03 0100   11 03 21.0 -15 44 54 107.5  20.9    3.55  063.2  324  +21   -58    0.09  077  -31   Map/Offsets
+

@@ -6,8 +6,12 @@ class ConfigStruct(object):
 		self.CAL_NAME = 'gaia_dr2_mag_11.5.npy'
 
 		# Location of the MPC data
-		self.DATA_DIR = '../data/'
-		self.DATA_NAME = 'mpc_data.txt'
+		self.OURS_DIR = '../data/'
+		self.OURS_NAME = 'mpc_data.txt'
+
+		# Location of finder data
+		self.FINDER_DIR = '../data/'
+		self.FINDER_NAME = '2019-01-02.txt'
 
 		# Location of the query results
 		self.QUERY_DIR = '../data/'

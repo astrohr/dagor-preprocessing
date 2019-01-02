@@ -62,9 +62,14 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     # Check if there is a warning string
     lines = lines[line_ind:-7]
 
-    if lines[1].startswith('This'):
-        for i in range(2):
-            del lines[1]
+    for i, line in enumerate(lines):
+        if line.startswith('This'):
+            del lines[i]
+
+    for i, line in enumerate(lines):
+        if line.startswith('The'):
+            del lines[i]
+
 
     # Form return string
     ret_str = '\n'.join(lines)
@@ -172,7 +177,7 @@ def getObservations(object_i):
     return '\n'.join(lines)
 
 
-def sName2Query(data_dir, data_name, save_dir, save_name):
+def sFinder2Query(data_dir, data_name, save_dir, save_name):
     """ Forms a query from a finder file. """
 
     mpc_str = ''

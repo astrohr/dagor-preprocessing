@@ -1,3 +1,6 @@
+""" Usage: PlanningTool.py (--ours | --finder)"""
+
+from docopt import docopt
 import random
 import numpy as np 
 import matplotlib.pyplot as plt
@@ -53,10 +56,14 @@ def findPlotBorders(object_dict):
 class PlanningTool(object):
 
     def __init__(self, cal_dir, cal_name, data_dir, data_name, query_dir, query_name, save_dir, save_name, \
-        x_span, y_span, lim_mag):
+        x_span, y_span, lim_mag, ours=True):
 
         # Form the query
-        fdata.sData2Query(data_dir, data_name, query_dir, query_name)
+        if ours == True:
+            fdata.sData2Query(data_dir, data_name, query_dir, query_name)
+
+        else:
+            fdata.sFinder2Query(data_dir, data_name, query_dir, query_name)
 
         # Load the query
         self.object_dict = rquer.readQuery(query_dir, query_name)
@@ -148,7 +155,7 @@ class PlanningTool(object):
         self.y_arr = []
 
         # Plotted uncertainties
-        self.uncertainties = None
+        self.uncertainties_arr = None
 
         self.ax.add_patch(self.fov_rect)
 
@@ -247,51 +254,56 @@ class PlanningTool(object):
                 ra_arr, dec_arr = val_arr[1], val_arr[2]
 
                 # Get current RA and Dec
-                ra_curr, dec_curr = ra_arr[0], dec_arr[0]
+                if len(ra_arr) and len(dec_arr): 
 
-                # Convert uncertainties to float
-                ra_uncertainties = uncertainties_arr[:, 0].astype('float')
-                dec_uncertainties = uncertainties_arr[:, 1].astype('float')
-                sign_arr = uncertainties_arr[:, 2]
+                    ra_curr, dec_curr = ra_arr[0], dec_arr[0]
 
-                # Form colors array
-                color_rgb_arr = []
+                    # Convert uncertainties to float
+                    ra_uncertainties = uncertainties_arr[:, 0].astype('float')
+                    dec_uncertainties = uncertainties_arr[:, 1].astype('float')
+                    sign_arr = uncertainties_arr[:, 2]
 
-                for sign in sign_arr:
-                
-                    # Get object color
-                    color = self.color_arr[i]
+                    # Form colors array
+                    color_rgb_arr = []
 
-                    # Form lighter and darker color
-                    rgb_darker_color = col.to_rgb(color)
-                    rgb_lighter_color = list([c + 0.1 for c in rgb_darker_color])
+                    for sign in sign_arr:
+                    
+                        # Get object color
+                        color = self.color_arr[i]
 
-                    if sign == '!':
-                        color_rgb_arr.append(rgb_darker_color)
+                        # Form lighter and darker color
+                        rgb_darker_color = col.to_rgb(color)
+                        rgb_lighter_color = list([c + 0.1 for c in rgb_darker_color])
 
-                    elif sign == '!':
-                        color_rgb_arr.append(rgb_lighter_color)
+                        if sign == '!':
+                            color_rgb_arr.append(rgb_darker_color)
+
+                        elif sign == '!':
+                            color_rgb_arr.append(rgb_lighter_color)
 
 
-                # Add uncertainties to center to get coordinates
-                ra_coords = ra_uncertainties + ra_curr
-                dec_coords = dec_uncertainties + dec_curr
+                    # Add uncertainties to center to get coordinates
+                    ra_coords = ra_uncertainties + ra_curr
+                    dec_coords = dec_uncertainties + dec_curr
 
-                # Update plot limits
-                self.ax.set_xlim(min(ra_coords), max(ra_coords))
-                self.ax.set_ylim(min(dec_coords), max(dec_coords))
+                    # Update plot limits
+                    self.ax.set_xlim(min(ra_coords), max(ra_coords))
+                    self.ax.set_ylim(min(dec_coords), max(dec_coords))
 
-                self.ax.set_aspect('equal')
+                    self.ax.set_aspect('equal')
 
-                # Plot uncertainties
-                self.uncertainties = self.ax.scatter(ra_coords, dec_coords, color=color_rgb_arr, marker='o', s=1)
+                    # Plot uncertainties
+                    uncertainties_i = self.ax.scatter(ra_coords, dec_coords, color=color_rgb_arr, marker='o', s=1)
+
+                    self.uncertainties_arr.append(uncertainties_i)
 
         # Hide uncertainties
         if (key == 'h') or (key == 'H'):
 
-            if self.uncertainties is not None:
+            if self.uncertainties_arr is not None:
 
-                self.uncertainties.remove()
+                for artist in self.uncertainties_arr: 
+                    artist.remove()
 
         # Update plot
         self.ax.figure.canvas.draw()
@@ -299,9 +311,21 @@ class PlanningTool(object):
 
 if __name__ == '__main__':
 
+    arguments = docopt(__doc__)
+
+    ours = arguments['--ours']
+
+    if ours == True:
+        data_dir = cfg.OURS_DIR
+        data_name = cfg.OURS_NAME
+
+    else:
+        data_dir = cfg.FINDER_DIR
+        data_name = cfg.FINDER_NAME
+
     # Create tool instance
-    pln = PlanningTool(cfg.CAL_DIR, cfg.CAL_NAME, cfg.DATA_DIR, cfg.DATA_NAME, cfg.QUERY_DIR, cfg.QUERY_NAME, cfg.SAVE_DIR, cfg.SAVE_NAME, \
-        cfg.X_SPAN, cfg.Y_SPAN, cfg.LIM_MAG)
+    pln = PlanningTool(cfg.CAL_DIR, cfg.CAL_NAME, data_dir, data_name, cfg.QUERY_DIR, cfg.QUERY_NAME, cfg.SAVE_DIR, cfg.SAVE_NAME, \
+        cfg.X_SPAN, cfg.Y_SPAN, cfg.LIM_MAG, ours=ours)
 
     # Show plot
     plt.show()
