@@ -107,6 +107,7 @@ class PlanningTool(object):
                     pa = np.deg2rad(pa_arr[i + 1])
                     r = np.sqrt((ra - ra_arr[i+1])**2 + (dec-dec_arr[i+1])**2)
                     self.ax.arrow(ra, dec, r*np.sin(pa), r*np.cos(pa), width=0.01)
+                    print(object_i, r, pa)
                 elif i == 1:
                     self.ax.scatter(ra, dec, c=color, marker='x')
                 if i != 3:
@@ -185,13 +186,12 @@ class PlanningTool(object):
         # Don't do anything is the mouse is not inside the plot
         if event.inaxes != self.fov_rect.axes: return
 
-        # Read cursor position
-        x_sel = event.xdata
-        y_sel = event.ydata
+        # Read new cursor position
+        self.onMouseMotion(event)
 
         # Save the position
-        self.x_arr.append(x_sel)
-        self.y_arr.append(y_sel)
+        self.x_arr.append(self.new_x)
+        self.y_arr.append(self.new_y)
 
         # Get the object name
         for i, object_i in enumerate(self.object_dict):
@@ -211,7 +211,7 @@ class PlanningTool(object):
             fmt='%7.7s %9.9s %9.9s')
 
         # Draw selected rectangle
-        rect = Rectangle((x_sel - self.x_off, y_sel - self.y_off), self.x_span, self.y_span, \
+        rect = Rectangle((self.new_x - self.x_off, self.new_y - self.y_off), self.x_span, self.y_span, \
             fill = True, alpha=0.5, facecolor='green', edgecolor='black', linewidth=1)
 
         self.ax.add_patch(rect)      
