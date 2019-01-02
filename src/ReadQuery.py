@@ -16,6 +16,10 @@ def readLine(line):
 	dec_str = line[26:33]
 	pa = line[60:65]
 
+	# print(line)
+
+	# print(date_str, ra_str, dec_str, pa)
+
 	# Convert RA string to degrees
 	ra_deg = float(ra_str) * 15
 

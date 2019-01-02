@@ -1,5 +1,6 @@
 import os
 import time
+import numpy as np
 from requests import get, post
 from bs4 import BeautifulSoup
 from astropy.time import Time
@@ -47,10 +48,26 @@ def fetchData(mpc_str, obs_code='L01', start='', eph_num=4, eph_int=2, eph_unit=
     # Create soup
     soup = BeautifulSoup(req.text, "html5lib")
 
-    # Form return string
-    ret_str = '\n'.join(soup.get_text().splitlines()[11:-7])
+    # Get start of measurements
+    lines = soup.get_text().splitlines()
 
-    # print(ret_str)
+    for i, line in enumerate(lines):
+        if line.startswith('Object'):
+            line_ind = i
+            break
+    
+
+    # Check if there is a warning string
+    lines = lines[line_ind:-7]
+
+    if lines[1].startswith('This'):
+        for i in range(2):
+            del lines[1]
+
+    # Form return string
+    ret_str = '\n'.join(lines)
+
+    print(ret_str)
     
     return ret_str
 
@@ -110,23 +127,21 @@ def getUncertainties(object_i):
 
         line_spl = line.split()
 
-        ra_off = str(line_spl[0])
-        dec_off = str(line_spl[1])
+        ra_off = int(str(line_spl[0]))
+        dec_off = int(str(line_spl[1]))
 
-        color = str(line_spl[-1])
+        # print(ra_off, dec_off)
 
-        ra_sign, ra_off = ra_off[0], int(ra_off[0:])
-        dec_sign, dec_off = dec_off[0], int(dec_off[0:])
-
-        if ra_sign == '-':
-            ra_off *= -1
-
-        if dec_sign == '-':
-            dec_off *= -1
+        sign = str(line_spl[-1])
 
         ra_off, dec_off = map(lambda x: float(x)/3600, [ra_off, dec_off])
 
-        out_arr.append((ra_off, dec_off, color))
+        # print(ra_off, dec_off)
+
+        out_arr.append([ra_off, dec_off, sign])
+
+    # Convert to numpy array
+    out_arr = np.asarray(out_arr)
 
     return out_arr
 

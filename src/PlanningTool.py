@@ -1,6 +1,7 @@
 import random
 import numpy as np 
 import matplotlib.pyplot as plt
+import matplotlib.colors as col
 import matplotlib.cm as cm
 from matplotlib.patches import Rectangle
 
@@ -146,11 +147,15 @@ class PlanningTool(object):
         self.x_arr = []
         self.y_arr = []
 
+        # Plotted uncertainties
+        self.uncertainties = None
+
         self.ax.add_patch(self.fov_rect)
 
         # Register mouse/keyboard events
         self.ax.figure.canvas.mpl_connect('motion_notify_event', self.onMouseMotion)
         self.ax.figure.canvas.mpl_connect('button_press_event', self.onMousePress)
+        self.ax.figure.canvas.mpl_connect('key_press_event', self.onKeyPress)
         
         # Set tight layout
         self.fig.tight_layout()
@@ -164,6 +169,10 @@ class PlanningTool(object):
 
         # Don't do anything is the mouse is not inside the plot
         if event.inaxes != self.fov_rect.axes: return
+
+        # Save plot limits
+        self.x_min, self.x_max = self.ax.get_xlim()
+        self.y_min, self.y_max = self.ax.get_ylim()
 
         # Read new cursor position
         self.new_x = event.xdata
@@ -215,6 +224,63 @@ class PlanningTool(object):
             fill = True, alpha=0.5, facecolor='green', edgecolor='black', linewidth=1)
 
         self.ax.add_patch(rect)      
+
+        # Update plot
+        self.ax.figure.canvas.draw()
+
+
+    def onKeyPress(self, event):
+        """ Evokes when a key is pressed. """
+
+        key = event.key
+
+        # Show uncertainties
+        if (key == 'u') or (key == 'U'):
+
+            # Go through all objects
+            for i, object_i in enumerate(self.object_dict):
+
+                # Get all uncertainties
+                uncertainties_arr = fdata.getUncertainties(object_i)
+
+                val_arr = self.object_dict[object_i]
+                ra_arr, dec_arr = val_arr[1], val_arr[2]
+
+                # Get current RA and Dec
+                ra_curr, dec_curr = ra_arr[0], dec_arr[0]
+
+                ra_uncertainties = uncertainties_arr[:, 0].astype('float')
+                dec_uncertainties = uncertainties_arr[:, 1].astype('float')
+                sign_arr = uncertainties_arr[:, 2]
+
+                color_rgb_arr = []
+                for sign in sign_arr:
+                    color = self.color_arr[i]
+                    rgb_darker_color = col.to_rgb(color)
+                    rgb_lighter_color = list([c + 0.1 for c in rgb_darker_color])
+                    if sign == '!':
+                        color_rgb_arr.append(rgb_darker_color)
+                    elif sign == '!':
+                        color_rgb_arr.append(rgb_lighter_color)
+
+
+                ra_coords = ra_uncertainties + ra_curr
+                dec_coords = dec_uncertainties + dec_curr
+
+                self.ax.set_xlim(min(ra_coords), max(ra_coords))
+                self.ax.set_ylim(min(dec_coords), max(dec_coords))
+
+                self.ax.set_aspect('equal')
+
+                # Plot uncertainties
+                self.uncertainties = self.ax.scatter(ra_coords, dec_coords, color=color_rgb_arr, marker='o', s=1)
+
+        # Hide uncertainties
+        if (key == 'h') or (key == 'H'):
+
+            if self.uncertainties is not None:
+
+                self.uncertainties.remove()
 
         # Update plot
         self.ax.figure.canvas.draw()
