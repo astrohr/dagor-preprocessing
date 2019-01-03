@@ -1,0 +1,17 @@
+{
+    "FILTERS":{
+        "obs_code": ["Obs. code?", "L01"],
+        "min_score": ["Min. score?", "25"],
+        "min_ef_mag": ["Min. ef. mag?", "22"],
+        "min_alt": ["Min. alt?", "15"],
+        "max_scat_xcoo": ["Max. scatteredness in x?", "1500"],
+        "max_scat_ycoo": ["Max. scatteredness in y", "1000"],
+        "max_not_seen": ["Max. not seen days?", "4"],
+        "max_sun_alt": ["Max. sun altitude?", "-15"],
+        "min_d_from_moon": ["Min. distance from Moon?", "20"],
+        "min_motion_speed": ["Min. motion speed?", "2.5"]
+    },
+    "OBS": {
+        "continuous": ["Continuous?", "1"]
+    }
+}

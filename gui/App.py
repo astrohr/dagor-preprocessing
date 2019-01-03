@@ -75,7 +75,7 @@ class App(Tk):
 
         
     def _buildFilters(self):
-        buildFilters(self)
+        buildFilters(self.filterFrame)
 
 
     def _buildPopups(self):
