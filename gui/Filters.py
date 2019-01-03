@@ -21,8 +21,6 @@ def buildFilters(master, file="filters.json"):
     obs = content.get("OBS")
 
     for filtr in filters:
-        print(filtr)
         text, ent = content["FILTERS"][filtr]
-        print(text, ent)
         ftr = Filter(master, text, ent)     
         ftr.frame.pack(fill=X)
