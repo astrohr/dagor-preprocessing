@@ -11,7 +11,7 @@ from matplotlib.patches import Rectangle
 import ReadCatalog as rcal
 import ReadQuery as rquer
 import FetchData as fdata
-import ParseSaved as pars
+import ParseLib as plib
 
 from Config import config as cfg
 
@@ -331,4 +331,4 @@ if __name__ == '__main__':
     plt.show()
 
     # Convert raw coordinates to telescope format
-    pars.parseRaw(cfg.SAVE_DIR, cfg.SAVE_NAME, cfg.FINAL_DIR, cfg.FINAL_NAME)
+    plib.parseRaw(cfg.SAVE_DIR, cfg.SAVE_NAME, cfg.FINAL_DIR, cfg.FINAL_NAME)
