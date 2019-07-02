@@ -26,7 +26,7 @@ isRunning = False
 
 config = ConfigParser()
 #Load presets
-config.read("config.ini")
+config.read("old_config.ini")
 
 #[OBS]
 obs_code = config["OBS"]["obs_code"]

@@ -7,8 +7,8 @@ from Console import *
 from Buttons import *
 from AddPopup import *
 import sys
-sys.path.insert(0, "../finder/")
-import planets
+#sys.path.insert(0, "../finder/")
+#import planets
 
 class App(Tk):
     def __init__(self, width, height, *args, **kwargs):
@@ -75,7 +75,7 @@ class App(Tk):
 
         
     def _buildFilters(self):
-        buildFilters(self)
+        buildFilters(self.filterFrame)
 
 
     def _buildPopups(self):
@@ -139,7 +139,6 @@ class App(Tk):
 
         
 
-
     @staticmethod
     def onFrameConfigure(canvas):
         """Reset the scroll region to encompass the inner frame"""
@@ -152,24 +151,6 @@ class App(Tk):
         self.setupConfig(cp)
 
     
-    def setupConfig(self, cp):
-        """cp - config parser or dictionary if manual setup"""
-        #[OBS]
-        self.obs_code = cp["OBS"]["obs_code"]
-        self.continous = cp["OBS"]["continuous"]
-
-        #[FILTER]
-        self.min_score = cp["FILTER"]["min_score"]
-        self.min_ef_mag = cp["FILTER"]["min_ef_mag"]
-        self.min_alt = cp["FILTER"]["min_alt"]
-        self.max_scat_xcoo = cp["FILTER"]["max_scat_xcoo"]
-        self.max_scat_ycoo = cp["FILTER"]["max_scat_ycoo"]
-        self.max_not_seen = cp["FILTER"]["max_not_seen"]
-        self.max_sun_alt = cp["FILTER"]["max_sun_alt"]
-        self.min_d_from_moon = cp["FILTER"]["min_d_from_moon"]
-        self.min_motion_speed = cp["FILTER"]["min_motion_speed"]
-
-
     def run(self):
         self.build()
         self.center()
@@ -178,6 +159,4 @@ class App(Tk):
 
 if __name__ == "__main__":
     root = App(800, 600)
-    root.loadConfig()
     root.run()
-    #manal add object
